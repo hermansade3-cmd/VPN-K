@@ -29,8 +29,6 @@ const FIREBASE_SIGNIN_PWD_URL = `https://identitytoolkit.googleapis.com/v1/accou
 
 const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
-// Kumbuka: session inahifadhiwa ndani ya kumbukumbu ya kikao (React state) tu.
-
 // ─── Helpers ────────────────────────────────────────────────────────────────
 function timeStr(d) {
   if (!d) return now();
@@ -84,6 +82,59 @@ function mapFirebaseError(code) {
     TOO_MANY_ATTEMPTS_TRY_LATER: "Majaribio mengi sana. Subiri kidogo kabla ya kujaribu tena.",
   };
   return map[code] || code || "Hitilafu isiyojulikana. Jaribu tena.";
+}
+
+// Tumia "refresh token" kupata idToken mpya bila kuhitaji nenosiri tena -
+// hii ndiyo msingi wa "kuingia automatically" baada ya kufunga na kufungua app.
+const FIREBASE_REFRESH_URL = `https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}`;
+
+async function firebaseRefreshIdToken(refreshToken) {
+  const res = await fetch(FIREBASE_REFRESH_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}`,
+  });
+  const data = await res.json();
+  if (data.error) {
+    const msg = data.error.message
+      || (data.error.errors && data.error.errors[0] && data.error.errors[0].message)
+      || "Kikao kimeisha muda";
+    throw new Error(mapFirebaseError(msg));
+  }
+  return data; // { id_token, refresh_token, user_id, expires_in, ... }
+}
+
+// ─── Kuhifadhi kikao (auto-login) ────────────────────────────────────────────
+// Tunajaribu kutumia "window.storage" (inayotolewa ndani ya Claude artifact).
+// Kama haipo - mfano ukifungua faili hili moja kwa moja kwenye kivinjari chako
+// au baada ya kuliweka kwenye server yako mwenyewe - tunarudi localStorage ya
+// kawaida ili kikao kiendelee kuhifadhiwa popote unapofungua app hii.
+const SESSION_KEY = "gmailchat_session";
+
+async function saveSession(session) {
+  const json = JSON.stringify(session);
+  try {
+    if (window.storage) { await window.storage.set(SESSION_KEY, json, false); return; }
+  } catch (e) {}
+  try { localStorage.setItem(SESSION_KEY, json); } catch (e) {}
+}
+
+async function loadSession() {
+  try {
+    if (window.storage) {
+      const r = await window.storage.get(SESSION_KEY, false);
+      return r && r.value ? JSON.parse(r.value) : null;
+    }
+  } catch (e) {}
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+async function clearSession() {
+  try { if (window.storage) await window.storage.delete(SESSION_KEY, false); } catch (e) {}
+  try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
 }
 
 // ─── Firestore REST helpers ─────────────────────────────────────────────────
@@ -211,6 +262,33 @@ async function firestoreGetMessages(idToken, cid) {
     });
 }
 
+// Pata document moja kwa njia yake kamili (mfano: "conversations/{cid}")
+async function firestoreGetDocument(idToken, path) {
+  const res = await fetch(`${FIRESTORE_BASE}/${path}`, {
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (!data.fields) return null;
+  return fromFirestoreFields(data.fields);
+}
+
+// Sasisha sehemu (fields) maalum tu za document, bila kugusa sehemu nyingine -
+// tunatumia hii kuweka hesabu ya "ujumbe haujasomwa" kuwa 0 wakati mtu anafungua chat.
+async function firestorePatchFields(idToken, path, data) {
+  const fields = {};
+  for (const k in data) fields[k] = toFirestoreValue(data[k]);
+  const mask = Object.keys(data).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join("&");
+  await fetch(`${FIRESTORE_BASE}/${path}?${mask}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({ fields }),
+  });
+}
+
 // Sasisha "metadata" ya mazungumzo (conversations/{cid}) - documenti moja
 // inayoshirikiwa na pande zote mbili, ina barua pepe za washiriki wawili
 // (p1Email, p2Email) ili kila upande aweze kuitafuta kwa query salama.
@@ -290,6 +368,91 @@ const S = {
   input: "#F5F5F5",
   red: "#E53935",
 };
+
+// ─── Hamburger Menu Drawer ───────────────────────────────────────────────────
+const MENU_LINKS = [
+  { icon: "📜", label: "Terms & Use", file: "Terms & Use.html" },
+  { icon: "🔒", label: "Sera ya Faragha", file: "Privacy Policy.html" },
+  { icon: "❓", label: "Msaada & FAQ", file: "Help & FAQ.html" },
+  { icon: "ℹ️", label: "Kuhusu GmailChat", file: "About.html" },
+  { icon: "📞", label: "Wasiliana Nasi", file: "Contact Us.html" },
+  { icon: "🛡️", label: "Usalama", file: "Security.html" },
+];
+
+function HamburgerDrawer({ open, onClose, userName, userEmail }) {
+  if (!open) return null;
+  return (
+    <>
+      {/* Overlay */}
+      <div onClick={onClose} style={{
+        position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
+        zIndex: 200, backdropFilter: "blur(1px)"
+      }} />
+      {/* Drawer */}
+      <div style={{
+        position: "fixed", top: 0, left: 0, bottom: 0, width: 280,
+        background: S.white, zIndex: 201,
+        boxShadow: "4px 0 24px rgba(0,0,0,0.18)",
+        display: "flex", flexDirection: "column",
+        animation: "slideIn 0.22s ease",
+        maxWidth: "80vw",
+      }}>
+        <style>{`@keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}`}</style>
+
+        {/* Header ya drawer */}
+        <div style={{
+          background: "linear-gradient(135deg,#26A69A,#00695C)",
+          padding: "30px 20px 20px",
+          display: "flex", flexDirection: "column", gap: 4
+        }}>
+          <div style={{
+            width: 52, height: 52, borderRadius: "50%",
+            background: "rgba(255,255,255,0.25)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 24, marginBottom: 10, border: "2px solid rgba(255,255,255,0.4)"
+          }}>✉️</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>
+            {userName || "Mtumiaji"}
+          </div>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.8)" }}>
+            {userEmail || ""}
+          </div>
+        </div>
+
+        {/* Mafaili ya menu */}
+        <div style={{ flex: 1, overflowY: "auto" }}>
+          {MENU_LINKS.map((item, i) => (
+            <a key={i} href={item.file}
+              style={{
+                display: "flex", alignItems: "center", gap: 14,
+                padding: "15px 20px",
+                textDecoration: "none", color: S.text,
+                borderBottom: `1px solid ${S.border}`,
+                fontSize: 15, fontWeight: 500,
+                transition: "background 0.12s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "#F0EBE1"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+              <span style={{ fontSize: 20, width: 28, textAlign: "center" }}>{item.icon}</span>
+              <span>{item.label}</span>
+              <span style={{ marginLeft: "auto", color: S.sub, fontSize: 18 }}>›</span>
+            </a>
+          ))}
+        </div>
+
+        {/* Footer ya drawer */}
+        <div style={{
+          padding: "14px 20px",
+          borderTop: `1px solid ${S.border}`,
+          fontSize: 12, color: S.sub, textAlign: "center"
+        }}>
+          GmailChat v1.0 · Powered by SadeHub
+        </div>
+      </div>
+    </>
+  );
+}
 
 function Avatar({ name, photo, size = 46, unread = 0 }) {
   const initials = (name || "?").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -492,6 +655,7 @@ function LoginScreen({ onSubmit, busy, error, mode, setMode }) {
 // ─── Main App ─────────────────────────────────────────────────────────────────
 function App() {
   const [user, setUser] = useState(null);          // { uid, name, email, token }
+  const [checkingSession, setCheckingSession] = useState(true);
   const [loginBusy, setLoginBusy] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [authMode, setAuthMode] = useState("login"); // login | signup
@@ -505,10 +669,37 @@ function App() {
   const [toast, setToast] = useState("");
   const [ncEmail, setNcEmail] = useState("");
   const [ncMsg, setNcMsg] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
   const endRef = useRef(null);
   const pollRef = useRef(null);
+  const inboxPollRef = useRef(null);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chats, active]);
+
+  // Mara app inapofunguka, angalia kama kuna kikao kilichohifadhiwa awali -
+  // kama kipo na bado ni sahihi, mtumiaji anaingia automatically bila form.
+  useEffect(() => {
+    (async () => {
+      const saved = await loadSession();
+      if (saved && saved.refreshToken) {
+        try {
+          const r = await firebaseRefreshIdToken(saved.refreshToken);
+          const restoredUser = {
+            uid: r.user_id,
+            name: saved.name,
+            email: saved.email,
+            token: r.id_token,
+          };
+          setUser(restoredUser);
+          await saveSession({ uid: restoredUser.uid, name: restoredUser.name, email: restoredUser.email, refreshToken: r.refresh_token });
+          loadThreads(restoredUser);
+        } catch (e) {
+          await clearSession();
+        }
+      }
+      setCheckingSession(false);
+    })();
+  }, []);
 
   function showToast(msg, ms = 3000) {
     setToast(msg);
@@ -541,6 +732,14 @@ function App() {
       };
       setUser(newUser);
 
+      // Hifadhi kikao ili mtumiaji asiingie tena baadaye (auto-login).
+      await saveSession({
+        uid: newUser.uid,
+        name: newUser.name,
+        email: newUser.email,
+        refreshToken: fbResult.refreshToken,
+      });
+
       // Hifadhi/sasisha taarifa za mtumiaji kwenye Firestore ili wengine
       // waweze kumtafuta kwa barua pepe.
       await firestoreUpsertUser(newUser.token, newUser.uid, {
@@ -558,6 +757,8 @@ function App() {
 
   function handleLogout() {
     if (pollRef.current) clearInterval(pollRef.current);
+    if (inboxPollRef.current) clearInterval(inboxPollRef.current);
+    clearSession();
     setUser(null);
     setContacts([]);
     setChats({});
@@ -566,10 +767,10 @@ function App() {
   }
 
   // ── Mazungumzo (Firestore) ──
-  async function loadThreads(forUser) {
+  async function loadThreads(forUser, quiet) {
     const u = forUser || user;
     if (!u) return;
-    setBusy(true);
+    if (!quiet) setBusy(true);
     try {
       const convos = await firestoreGetConversationsFor(u.token, u.email);
       const sorted = convos.sort((a, b) => (b.lastTs || 0) - (a.lastTs || 0));
@@ -577,25 +778,29 @@ function App() {
         const isP1 = c.p1Email === u.email;
         const peerEmail = isP1 ? c.p2Email : c.p1Email;
         const peerName = isP1 ? c.p2Name : c.p1Name;
+        const myUnread = isP1 ? (c.p1Unread || 0) : (c.p2Unread || 0);
         return {
           id: c.id,
           name: peerName || (peerEmail ? peerEmail.split("@")[0] : "Mgeni"),
           email: peerEmail || "",
           lastMsg: c.lastMsg || "",
           lastTime: c.lastTime || "",
-          unread: 0,
+          unread: myUnread,
         };
       }));
     } catch (e) {
-      showToast("Imeshindwa kupakia: " + e.message);
+      if (!quiet) showToast("Imeshindwa kupakia: " + e.message);
     }
-    setBusy(false);
+    if (!quiet) setBusy(false);
   }
 
   async function openThread(contact) {
     setActive(contact);
     setView("chat");
     setBusy(true);
+    // Ondoa alama ya ujumbe mpya papo hapo kwenye orodha (UI), kabla hata
+    // ya kusubiri jibu la server.
+    setContacts(cs => cs.map(c => c.id === contact.id ? { ...c, unread: 0 } : c));
     try {
       const msgs = await firestoreGetMessages(user.token, contact.id);
       setChats(c => ({
@@ -608,6 +813,12 @@ function App() {
           direction: m.fromEmail === user.email ? "out" : "in",
         })),
       }));
+      // Sasisha kwenye Firestore pia, kwa "field" yangu pekee, ili
+      // hesabu ya ujumbe mpya isirudi tena baada ya refresh.
+      const sortedEmails = [user.email, contact.email].sort();
+      const isUserP1 = sortedEmails[0] === user.email;
+      const myField = isUserP1 ? "p1Unread" : "p2Unread";
+      firestorePatchFields(user.token, `conversations/${contact.id}`, { [myField]: 0 }).catch(() => {});
     } catch (e) {
       showToast("Imeshindwa kupakia ujumbe: " + e.message);
     }
@@ -637,6 +848,13 @@ function App() {
       tsLabel: now(),
     });
 
+    // Hesabu ya "ujumbe haujasomwa" - tunamuongezea mpokeaji 1, na kumuwekea
+    // mtumaji 0 (kwa kuwa yeye yupo ndani ya mazungumzo hivi sasa).
+    const existing = await firestoreGetDocument(user.token, `conversations/${cid}`);
+    const recipientField = isUserP1 ? "p2Unread" : "p1Unread";
+    const senderField = isUserP1 ? "p1Unread" : "p2Unread";
+    const recipientCurrent = (existing && existing[recipientField]) || 0;
+
     // Hifadhi/sasisha metadata ya mazungumzo - hii ndiyo inayowezesha
     // pande zote mbili kuona thread hii kwenye inbox yao (query kwa email).
     await firestoreUpsertConversation(user.token, cid, {
@@ -647,6 +865,8 @@ function App() {
       lastTs: Date.now(),
       lastMsg: text.slice(0, 60),
       lastTime: now(),
+      [recipientField]: recipientCurrent + 1,
+      [senderField]: 0,
     });
 
     return cid;
@@ -704,6 +924,14 @@ function App() {
     }
   }, [view, active?.id, user?.uid]);
 
+  // Polling kimya kwenye inbox: kuonyesha alama za ujumbe mpya bila kubofya Refresh
+  useEffect(() => {
+    if (view === "inbox" && user) {
+      inboxPollRef.current = setInterval(() => { loadThreads(user, true); }, 8000);
+      return () => clearInterval(inboxPollRef.current);
+    }
+  }, [view, user?.uid]);
+
   const activeChats = active ? (chats[active.id] || []) : [];
 
   // ── Shell ──
@@ -715,6 +943,13 @@ function App() {
       boxShadow: "0 0 40px rgba(0,0,0,0.12)", overflow: "hidden"
     }}>
 
+      <HamburgerDrawer
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        userName={user?.name}
+        userEmail={user?.email}
+      />
+
       {toast && (
         <div style={{
           position: "absolute", top: 68, left: "50%", transform: "translateX(-50%)",
@@ -724,8 +959,19 @@ function App() {
         }}>{toast}</div>
       )}
 
+      {/* ═══ INAKAGUA KIKAO KILICHOHIFADHIWA ═══ */}
+      {checkingSession && (
+        <div style={{
+          flex: 1, display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", background: S.bg
+        }}>
+          <div style={{ fontSize: 40, marginBottom: 10 }}>⏳</div>
+          <div style={{ fontSize: 13, color: S.sub }}>Inakagua kikao...</div>
+        </div>
+      )}
+
       {/* ═══ NOT LOGGED IN ═══ */}
-      {!user && (
+      {!checkingSession && !user && (
         <>
           <div style={{
             background: S.white, padding: "14px 16px",
@@ -740,7 +986,7 @@ function App() {
       )}
 
       {/* ═══ LOGGED IN ═══ */}
-      {user && (
+      {!checkingSession && user && (
         <>
           {/* ── INBOX ── */}
           {view === "inbox" && (
@@ -752,7 +998,12 @@ function App() {
                 boxShadow: "0 2px 8px rgba(0,0,0,0.06)", flexShrink: 0
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 22 }}>☰</span>
+                  <button onClick={() => setMenuOpen(true)} style={{
+                    background: "none", border: "none", cursor: "pointer",
+                    fontSize: 22, padding: "2px 4px", color: S.text,
+                    display: "flex", alignItems: "center",
+                    borderRadius: 6, transition: "background 0.12s"
+                  }} title="Menyu">☰</button>
                   <span style={{ fontSize: 21, fontWeight: 800, color: S.green }}>Messages</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
