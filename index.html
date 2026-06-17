@@ -1,286 +1,960 @@
 <!DOCTYPE html>
 <html lang="sw">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel</title>
-
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      background: #1c1e21;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      color: #fff;
-    }
-
-    #loginScreen {
-      width: 100%;
-      max-width: 320px;
-      text-align: center;
-    }
-
-    .admin-title { font-size: 28px; font-weight: 800; color: #1877f2; margin-bottom: 8px; }
-    .admin-sub { font-size: 14px; color: #90949c; margin-bottom: 24px; }
-
-    .admin-input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid #3a3b3c;
-      border-radius: 6px;
-      font-size: 17px;
-      color: #fff;
-      background: #3a3b3c;
-      outline: none;
-      font-family: inherit;
-      margin-bottom: 12px;
-      text-align: center;
-      letter-spacing: 4px;
-    }
-    .admin-input::placeholder { letter-spacing: 0; color: #606770; }
-    .admin-input:focus { border-color: #1877f2; }
-
-    .btn-enter {
-      width: 100%;
-      padding: 14px;
-      background: #1877f2;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .btn-enter:hover { background: #166fe5; }
-
-    .err-login { color: #e02b2b; font-size: 13px; margin-top: 10px; display: none; }
-    .err-login.show { display: block; }
-
-    #adminPanel { display: none; width: 100%; max-width: 700px; }
-
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .panel-title { font-size: 22px; font-weight: 700; color: #1877f2; }
-    .panel-count { font-size: 13px; color: #90949c; }
-
-    .btn-csv {
-      padding: 8px 16px;
-      background: #42b72a;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .btn-csv:hover { background: #36a420; }
-
-    .btn-signout {
-      padding: 8px 16px;
-      background: #3a3b3c;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .btn-signout:hover { background: #4a4b4c; }
-
-    .table-wrap { overflow-x: auto; border-radius: 8px; background: #242526; }
-
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    thead { background: #1877f2; }
-    thead th { padding: 12px 16px; text-align: left; font-weight: 700; color: #fff; white-space: nowrap; }
-    tbody tr { border-bottom: 1px solid #3a3b3c; transition: background 0.1s; }
-    tbody tr:hover { background: #3a3b3c; }
-    tbody td { padding: 12px 16px; color: #e4e6eb; word-break: break-all; }
-
-    .badge-no { background: #3a3b3c; color: #90949c; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
-    .loading { text-align: center; padding: 40px; color: #90949c; font-size: 15px; }
-    .empty { text-align: center; padding: 40px; color: #90949c; font-size: 15px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>GmailChat</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: #F0EBE1; overflow: hidden; }
+  body { font-family: Inter, "Segoe UI", -apple-system, Roboto, sans-serif; }
+  #root { height: 100vh; height: 100dvh; }
+  input::placeholder, textarea::placeholder { color: #999; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.28.4/babel.min.js"></script>
 </head>
-
 <body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useRef, useEffect } = React;
 
-  <div id="loginScreen">
-    <div class="admin-title">🔐 Admin</div>
-    <div class="admin-sub">Weka password ya siri</div>
-    <input class="admin-input" type="password" id="pinInput" placeholder="••••" maxlength="20">
-    <button class="btn-enter" onclick="ingia()">Ingia</button>
-    <div class="err-login" id="errLogin">Password si sahihi.</div>
-  </div>
+// ─── Firebase setup (REST API tu - hauhitaji firebase SDK) ─────────────────
+const FIREBASE_API_KEY = "AIzaSyDh05C50ezVo6Msus1sh7sfxXoV0ORbVMk";
+const FIREBASE_PROJECT_ID = "smschat-af3e5";
 
-  <div id="adminPanel">
-    <div class="panel-header">
-      <div>
-        <div class="panel-title">📋 Logins</div>
-        <div class="panel-count" id="countLabel">Inapakia...</div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn-csv" onclick="downloadCSV()">⬇ CSV</button>
-        <button class="btn-signout" onclick="toka()">Toka</button>
-      </div>
-    </div>
+const FIREBASE_SIGNUP_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`;
+const FIREBASE_SIGNIN_PWD_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`;
 
-    <div class="table-wrap">
-      <div class="loading" id="loadingMsg">⏳ Inapakia data...</div>
-      <table id="dataTable" style="display:none;">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Taarifa (Email / Jina / Simu)</th>
-            <th>Password</th>
-            <th>Wakati</th>
-            <th>Kifaa</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-      <div class="empty" id="emptyMsg" style="display:none;">Hakuna data bado.</div>
-    </div>
-  </div>
+const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
-<script type="module">
-  import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, orderBy, query }
-    from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+// Kumbuka: session inahifadhiwa ndani ya kumbukumbu ya kikao (React state) tu.
 
-  const ADMIN_PIN = "4944";
+// ─── Helpers ────────────────────────────────────────────────────────────────
+function timeStr(d) {
+  if (!d) return now();
+  try { return new Date(d).toLocaleTimeString("sw-TZ", { hour: "2-digit", minute: "2-digit" }); }
+  catch { return now(); }
+}
+function now() {
+  return new Date().toLocaleTimeString("sw-TZ", { hour: "2-digit", minute: "2-digit" });
+}
 
-  const firebaseConfig = {
-    apiKey:            "AIzaSyDCKHDp1VpDTRr4-HGqgE1OFkEwWIDZyqI",
-    authDomain:        "sadegpt-f79d7.firebaseapp.com",
-    projectId:         "sadegpt-f79d7",
-    storageBucket:     "sadegpt-f79d7.firebasestorage.app",
-    messagingSenderId: "474328809093",
-    appId:             "1:474328809093:web:e94c3af5eca2e7949fb3ec"
+// Funguo ya mazungumzo - imara kati ya akaunti mbili, isiyojali mpangilio
+function convoId(emailA, emailB) {
+  const a = emailA.trim().toLowerCase();
+  const b = emailB.trim().toLowerCase();
+  return [a, b].sort().join("__").replace(/[^a-zA-Z0-9_@.]/g, "_");
+}
+
+// ─── Firebase Auth REST helpers (email + password) ──────────────────────────
+async function firebaseSignUp(email, password) {
+  const res = await fetch(FIREBASE_SIGNUP_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, returnSecureToken: true }),
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(mapFirebaseError(data.error.message));
+  return data; // { idToken, email, localId, refreshToken, ... }
+}
+
+async function firebaseSignIn(email, password) {
+  const res = await fetch(FIREBASE_SIGNIN_PWD_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, returnSecureToken: true }),
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(mapFirebaseError(data.error.message));
+  return data;
+}
+
+function mapFirebaseError(code) {
+  const map = {
+    EMAIL_EXISTS: "Barua pepe hii tayari imesajiliwa. Jaribu kuingia badala ya kujisajili.",
+    EMAIL_NOT_FOUND: "Akaunti haipo. Jisajili kwanza.",
+    INVALID_PASSWORD: "Nenosiri si sahihi.",
+    INVALID_LOGIN_CREDENTIALS: "Barua pepe au nenosiri si sahihi.",
+    USER_DISABLED: "Akaunti hii imezuiwa.",
+    WEAK_PASSWORD: "Nenosiri ni dhaifu, weka angalau herufi 6.",
+    INVALID_EMAIL: "Barua pepe si sahihi.",
+    MISSING_PASSWORD: "Weka nenosiri.",
+    TOO_MANY_ATTEMPTS_TRY_LATER: "Majaribio mengi sana. Subiri kidogo kabla ya kujaribu tena.",
   };
+  return map[code] || code || "Hitilafu isiyojulikana. Jaribu tena.";
+}
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
-  let allData = [];
+// ─── Firestore REST helpers ─────────────────────────────────────────────────
+// Tunatumia Firestore "structured" document format moja kwa moja kupitia REST,
+// kwa kuwa hatutumii firebase SDK.
 
-  function ingia() {
-    const pin = document.getElementById("pinInput").value;
-    if (pin === ADMIN_PIN) {
-      document.getElementById("loginScreen").style.display = "none";
-      document.getElementById("adminPanel").style.display  = "block";
-      loadData();
-    } else {
-      document.getElementById("errLogin").classList.add("show");
-      document.getElementById("pinInput").value = "";
-    }
+function toFirestoreValue(v) {
+  if (v === null || v === undefined) return { nullValue: null };
+  if (typeof v === "string") return { stringValue: v };
+  if (typeof v === "number") return { integerValue: String(Math.trunc(v)) };
+  if (typeof v === "boolean") return { booleanValue: v };
+  return { stringValue: String(v) };
+}
+
+function fromFirestoreFields(fields) {
+  const out = {};
+  for (const k in fields || {}) {
+    const v = fields[k];
+    if ("stringValue" in v) out[k] = v.stringValue;
+    else if ("integerValue" in v) out[k] = Number(v.integerValue);
+    else if ("doubleValue" in v) out[k] = v.doubleValue;
+    else if ("booleanValue" in v) out[k] = v.booleanValue;
+    else if ("nullValue" in v) out[k] = null;
+    else out[k] = null;
+  }
+  return out;
+}
+
+// Hifadhi/sasisha taarifa za mtumiaji kwenye users/{uid} - inahitajika ili
+// watu wengine waweze kuona jina lako wakati wanachati nawe.
+async function firestoreUpsertUser(idToken, uid, profile) {
+  const url = `${FIRESTORE_BASE}/users/${uid}`;
+  const fields = {};
+  for (const k in profile) fields[k] = toFirestoreValue(profile[k]);
+  await fetch(url, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({ fields }),
+  });
+}
+
+// Tafuta mtumiaji kwa barua pepe (huhitaji rule inayoruhusu "list" salama,
+// kwa hiyo tunatumia query iliyofungwa na barua pepe halisi).
+async function firestoreFindUserByEmail(idToken, email) {
+  const url = `${FIRESTORE_BASE}:runQuery`;
+  const body = {
+    structuredQuery: {
+      from: [{ collectionId: "users" }],
+      where: {
+        fieldFilter: {
+          field: { fieldPath: "email" },
+          op: "EQUAL",
+          value: { stringValue: email.trim().toLowerCase() },
+        },
+      },
+      limit: 1,
+    },
+  };
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  const row = Array.isArray(data) ? data.find(r => r.document) : null;
+  if (!row) return null;
+  const fields = fromFirestoreFields(row.document.fields);
+  const name = row.document.name || "";
+  const uid = name.split("/").pop();
+  return { uid, ...fields };
+}
+
+// Tuma ujumbe mpya kwenye mazungumzo (conversations/{convoId}/messages)
+async function firestoreSendMessage(idToken, cid, msg) {
+  const url = `${FIRESTORE_BASE}/conversations/${cid}/messages`;
+  const fields = {};
+  for (const k in msg) fields[k] = toFirestoreValue(msg[k]);
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({ fields }),
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || "Imeshindwa kutuma ujumbe");
+  return data;
+}
+
+// Pata ujumbe wote wa mazungumzo fulani, kwa mpangilio wa muda.
+// MUHIMU: query ya subcollection lazima ielekezwe kwenye njia ya document
+// mzazi (conversations/{cid}), si kwenye mzizi wa "documents" pekee - hapo
+// ndipo kosa la zamani lilikuwa, na ndiyo sababu ujumbe haukuonekana kabisa.
+async function firestoreGetMessages(idToken, cid) {
+  const url = `${FIRESTORE_BASE}/conversations/${cid}:runQuery`;
+  const body = {
+    structuredQuery: {
+      from: [{ collectionId: "messages" }],
+      orderBy: [{ field: { fieldPath: "ts" }, direction: "ASCENDING" }],
+    },
+  };
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!Array.isArray(data)) return [];
+  return data
+    .filter(r => r.document)
+    .map(r => {
+      const f = fromFirestoreFields(r.document.fields);
+      const id = r.document.name.split("/").pop();
+      return { id, ...f };
+    });
+}
+
+// Sasisha "metadata" ya mazungumzo (conversations/{cid}) - documenti moja
+// inayoshirikiwa na pande zote mbili, ina barua pepe za washiriki wawili
+// (p1Email, p2Email) ili kila upande aweze kuitafuta kwa query salama.
+async function firestoreUpsertConversation(idToken, cid, data) {
+  const fields = {};
+  for (const k in data) fields[k] = toFirestoreValue(data[k]);
+  // Jaribu kuunda; kama tayari ipo, sasisha kwa PATCH badala yake.
+  let res = await fetch(`${FIRESTORE_BASE}/conversations?documentId=${cid}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({ fields }),
+  });
+  if (!res.ok) {
+    res = await fetch(`${FIRESTORE_BASE}/conversations/${cid}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ fields }),
+    });
+  }
+  return res.json();
+}
+
+// Pata mazungumzo yote ambapo barua pepe yangu ni p1Email AU p2Email.
+async function firestoreGetConversationsFor(idToken, email) {
+  async function queryField(field) {
+    const body = {
+      structuredQuery: {
+        from: [{ collectionId: "conversations" }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: field },
+            op: "EQUAL",
+            value: { stringValue: email },
+          },
+        },
+      },
+    };
+    const res = await fetch(`${FIRESTORE_BASE}:runQuery`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!Array.isArray(data)) return [];
+    return data
+      .filter(r => r.document)
+      .map(r => {
+        const f = fromFirestoreFields(r.document.fields);
+        const id = r.document.name.split("/").pop();
+        return { id, ...f };
+      });
+  }
+  const [a, b] = await Promise.all([queryField("p1Email"), queryField("p2Email")]);
+  const merged = [...a, ...b];
+  const seen = new Set();
+  return merged.filter(c => (seen.has(c.id) ? false : (seen.add(c.id), true)));
+}
+
+// ─── UI Components ───────────────────────────────────────────────────────────
+const S = {
+  bg: "#F0EBE1",
+  white: "#FFFFFF",
+  green: "#26A69A",
+  greenDark: "#00897B",
+  text: "#1A1A1A",
+  sub: "#666666",
+  border: "rgba(0,0,0,0.08)",
+  input: "#F5F5F5",
+  red: "#E53935",
+};
+
+function Avatar({ name, photo, size = 46, unread = 0 }) {
+  const initials = (name || "?").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  return (
+    <div style={{ position: "relative", flexShrink: 0 }}>
+      {photo ? (
+        <img src={photo} alt={name} style={{
+          width: size, height: size, borderRadius: "50%",
+          objectFit: "cover", boxShadow: "0 2px 6px rgba(0,0,0,0.15)"
+        }} />
+      ) : (
+        <div style={{
+          width: size, height: size, borderRadius: "50%",
+          background: "linear-gradient(135deg,#26A69A,#00897B)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "#fff", fontWeight: 700, fontSize: size * 0.35,
+          boxShadow: "0 2px 6px rgba(38,166,154,0.3)"
+        }}>{initials}</div>
+      )}
+      {unread > 0 && (
+        <div style={{
+          position: "absolute", top: -2, right: -2,
+          background: S.red, borderRadius: "50%",
+          width: 18, height: 18, fontSize: 10, fontWeight: 700,
+          color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
+          border: `2px solid ${S.bg}`
+        }}>{unread > 9 ? "9+" : unread}</div>
+      )}
+    </div>
+  );
+}
+
+function ContactRow({ contact, onClick }) {
+  return (
+    <div onClick={onClick} style={{
+      display: "flex", alignItems: "center", gap: 14,
+      padding: "13px 16px", cursor: "pointer",
+      borderBottom: `1px solid ${S.border}`,
+      background: S.white,
+      transition: "background 0.12s",
+    }}
+      onMouseEnter={e => e.currentTarget.style.background = "#F7F3EC"}
+      onMouseLeave={e => e.currentTarget.style.background = S.white}
+    >
+      <Avatar name={contact.name} size={48} unread={contact.unread || 0} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+          <span style={{ fontWeight: 700, fontSize: 15, color: S.text }}>{contact.name}</span>
+          <span style={{ fontSize: 12, color: S.sub }}>{contact.lastTime}</span>
+        </div>
+        <div style={{
+          fontSize: 13, color: S.sub,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
+        }}>{contact.lastMsg || contact.email}</div>
+      </div>
+    </div>
+  );
+}
+
+function Bubble({ msg }) {
+  const out = msg.direction === "out";
+  return (
+    <div style={{
+      display: "flex", justifyContent: out ? "flex-end" : "flex-start",
+      padding: "2px 12px", marginBottom: 2
+    }}>
+      <div style={{
+        maxWidth: "76%",
+        background: out ? "#DCF8C6" : S.white,
+        borderRadius: out ? "16px 4px 16px 16px" : "4px 16px 16px 16px",
+        padding: "9px 12px 6px",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+      }}>
+        {!out && msg.from && (
+          <div style={{ fontSize: 12, color: S.green, fontWeight: 700, marginBottom: 2 }}>{msg.from}</div>
+        )}
+        <div style={{ fontSize: 14, color: S.text, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{msg.text}</div>
+        <div style={{ fontSize: 11, color: "#999", textAlign: "right", marginTop: 4, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 3 }}>
+          {msg.time}
+          {out && <span style={{ color: S.green }}>✓✓</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Login Screen ────────────────────────────────────────────────────────────
+function LoginScreen({ onSubmit, busy, error, mode, setMode }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+
+  const isSignup = mode === "signup";
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    onSubmit({ email: email.trim(), password, name: name.trim() });
   }
 
-  async function loadData() {
-    try {
-      const q = query(collection(db, "logins"), orderBy("wakati", "desc"));
-      const snap = await getDocs(q);
-      allData = [];
-      snap.forEach(doc => allData.push({ id: doc.id, ...doc.data() }));
-      renderTable(allData);
-    } catch (e) {
-      try {
-        const snap = await getDocs(collection(db, "logins"));
-        allData = [];
-        snap.forEach(doc => allData.push({ id: doc.id, ...doc.data() }));
-        renderTable(allData);
-      } catch (e2) {
-        document.getElementById("loadingMsg").textContent = "Hitilafu: " + e2.message;
-      }
-    }
+  return (
+    <div style={{
+      flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      background: S.bg, padding: "24px 32px", overflowY: "auto",
+      WebkitOverflowScrolling: "touch"
+    }}>
+      <div style={{
+        width: 88, height: 88, borderRadius: "50%",
+        background: "linear-gradient(135deg,#26A69A,#00695C)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 42, marginBottom: 24, flexShrink: 0
+      }}>✉️</div>
+
+      <h1 style={{
+        fontSize: 28, fontWeight: 800, color: S.text,
+        margin: "0 0 8px", textAlign: "center"
+      }}>GmailChat</h1>
+      <p style={{
+        fontSize: 14, color: S.sub, textAlign: "center",
+        margin: "0 0 28px", lineHeight: 1.7, maxWidth: 280
+      }}>
+        Zungumza na marafiki kwa barua pepe — {isSignup ? "Jisajili kuanza." : "Ingia na akaunti yako."}
+      </p>
+
+      <form onSubmit={handleSubmit} style={{ width: "100%", maxWidth: 320 }}>
+        {isSignup && (
+          <input
+            type="text" value={name} onChange={e => setName(e.target.value)}
+            placeholder="Jina lako"
+            style={{
+              width: "100%", background: S.white, border: `1.5px solid ${S.border}`,
+              borderRadius: 12, padding: "13px 16px", fontSize: 16,
+              color: S.text, boxSizing: "border-box", outline: "none",
+              fontFamily: "inherit", marginBottom: 12
+            }}
+          />
+        )}
+        <input
+          type="email" value={email} onChange={e => setEmail(e.target.value)}
+          placeholder="Barua pepe" required
+          style={{
+            width: "100%", background: S.white, border: `1.5px solid ${S.border}`,
+            borderRadius: 12, padding: "13px 16px", fontSize: 16,
+            color: S.text, boxSizing: "border-box", outline: "none",
+            fontFamily: "inherit", marginBottom: 12
+          }}
+        />
+        <input
+          type="password" value={password} onChange={e => setPassword(e.target.value)}
+          placeholder="Nenosiri (angalau herufi 6)" required minLength={6}
+          style={{
+            width: "100%", background: S.white, border: `1.5px solid ${S.border}`,
+            borderRadius: 12, padding: "13px 16px", fontSize: 16,
+            color: S.text, boxSizing: "border-box", outline: "none",
+            fontFamily: "inherit", marginBottom: 18
+          }}
+        />
+
+        <button
+          type="submit"
+          disabled={busy}
+          style={{
+            width: "100%",
+            background: busy ? "#9fd8d1" : S.green,
+            border: "none", color: "#fff",
+            borderRadius: 24, padding: "14px 20px",
+            fontSize: 15, fontWeight: 700,
+            cursor: busy ? "wait" : "pointer",
+            boxShadow: "0 4px 14px rgba(38,166,154,0.4)",
+            transition: "all 0.2s"
+          }}
+        >
+          {busy ? "⏳ Inasubiri..." : (isSignup ? "✉️ Jisajili" : "Ingia")}
+        </button>
+      </form>
+
+      {error && (
+        <div style={{
+          marginTop: 16, padding: "10px 16px",
+          background: "#FFEBEE", borderRadius: 10,
+          fontSize: 13, color: S.red, textAlign: "center",
+          maxWidth: 320, width: "100%"
+        }}>⚠️ {error}</div>
+      )}
+
+      <button
+        onClick={() => setMode(isSignup ? "login" : "signup")}
+        style={{
+          marginTop: 20, marginBottom: 12, background: "none", border: "none",
+          color: S.green, fontSize: 13, fontWeight: 600,
+          cursor: "pointer", padding: 8, flexShrink: 0
+        }}
+      >
+        {isSignup ? "Una akaunti tayari? Ingia" : "Hauna akaunti? Jisajili"}
+      </button>
+    </div>
+  );
+}
+
+// ─── Main App ─────────────────────────────────────────────────────────────────
+function App() {
+  const [user, setUser] = useState(null);          // { uid, name, email, token }
+  const [loginBusy, setLoginBusy] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [authMode, setAuthMode] = useState("login"); // login | signup
+
+  const [view, setView] = useState("inbox");        // inbox | chat | newChat
+  const [contacts, setContacts] = useState([]);
+  const [active, setActive] = useState(null);
+  const [chats, setChats] = useState({});
+  const [input, setInput] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [toast, setToast] = useState("");
+  const [ncEmail, setNcEmail] = useState("");
+  const [ncMsg, setNcMsg] = useState("");
+  const endRef = useRef(null);
+  const pollRef = useRef(null);
+
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chats, active]);
+
+  function showToast(msg, ms = 3000) {
+    setToast(msg);
+    setTimeout(() => setToast(""), ms);
   }
 
-  function renderTable(data) {
-    document.getElementById("loadingMsg").style.display = "none";
-    document.getElementById("countLabel").textContent   = `Jumla: ${data.length} rekodi`;
-
-    if (data.length === 0) {
-      document.getElementById("emptyMsg").style.display = "block";
+  // ── Login / Jisajili (Firebase Auth REST API) ──
+  async function handleAuthSubmit({ email, password, name }) {
+    if (!email || !password) {
+      setLoginError("Jaza barua pepe na nenosiri.");
       return;
     }
+    setLoginBusy(true);
+    setLoginError("");
+    try {
+      const fbResult = authMode === "signup"
+        ? await firebaseSignUp(email, password)
+        : await firebaseSignIn(email, password);
 
-    document.getElementById("dataTable").style.display = "table";
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
+      const cleanEmail = fbResult.email.trim().toLowerCase();
+      const displayName = authMode === "signup"
+        ? (name || cleanEmail.split("@")[0])
+        : (name || cleanEmail.split("@")[0]);
 
-    data.forEach((row, i) => {
-      const wakati = row.wakati
-        ? new Date(row.wakati.seconds * 1000).toLocaleString("sw-TZ")
-        : "—";
+      const newUser = {
+        uid: fbResult.localId,
+        name: displayName,
+        email: cleanEmail,
+        token: fbResult.idToken,
+      };
+      setUser(newUser);
 
-      // Taarifa — inakubali email, identifier, au jina
-      const taarifa = row.identifier || row.email || row.jina || row.simu || "—";
+      // Hifadhi/sasisha taarifa za mtumiaji kwenye Firestore ili wengine
+      // waweze kumtafuta kwa barua pepe.
+      await firestoreUpsertUser(newUser.token, newUser.uid, {
+        name: displayName,
+        email: cleanEmail,
+      });
 
-      let kifaa = row.userAgent || "—";
-      if (kifaa.includes("Android"))      kifaa = "Android";
-      else if (kifaa.includes("iPhone"))  kifaa = "iPhone";
-      else if (kifaa.includes("Windows")) kifaa = "Windows";
-      else if (kifaa.includes("Mac"))     kifaa = "Mac";
-      else kifaa = "Nyingine";
+      showToast(`Karibu, ${displayName.split(" ")[0]}! ✓`);
+      loadThreads(newUser);
+    } catch (e) {
+      setLoginError(e.message || "Imeshindwa. Jaribu tena.");
+    }
+    setLoginBusy(false);
+  }
 
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><span class="badge-no">${i + 1}</span></td>
-        <td>${taarifa}</td>
-        <td>${row.password || "—"}</td>
-        <td>${wakati}</td>
-        <td>${kifaa}</td>
-      `;
-      tbody.appendChild(tr);
+  function handleLogout() {
+    if (pollRef.current) clearInterval(pollRef.current);
+    setUser(null);
+    setContacts([]);
+    setChats({});
+    setActive(null);
+    setView("inbox");
+  }
+
+  // ── Mazungumzo (Firestore) ──
+  async function loadThreads(forUser) {
+    const u = forUser || user;
+    if (!u) return;
+    setBusy(true);
+    try {
+      const convos = await firestoreGetConversationsFor(u.token, u.email);
+      const sorted = convos.sort((a, b) => (b.lastTs || 0) - (a.lastTs || 0));
+      setContacts(sorted.map(c => {
+        const isP1 = c.p1Email === u.email;
+        const peerEmail = isP1 ? c.p2Email : c.p1Email;
+        const peerName = isP1 ? c.p2Name : c.p1Name;
+        return {
+          id: c.id,
+          name: peerName || (peerEmail ? peerEmail.split("@")[0] : "Mgeni"),
+          email: peerEmail || "",
+          lastMsg: c.lastMsg || "",
+          lastTime: c.lastTime || "",
+          unread: 0,
+        };
+      }));
+    } catch (e) {
+      showToast("Imeshindwa kupakia: " + e.message);
+    }
+    setBusy(false);
+  }
+
+  async function openThread(contact) {
+    setActive(contact);
+    setView("chat");
+    setBusy(true);
+    try {
+      const msgs = await firestoreGetMessages(user.token, contact.id);
+      setChats(c => ({
+        ...c,
+        [contact.id]: msgs.map(m => ({
+          id: m.id,
+          from: m.fromEmail === user.email ? "Wewe" : contact.name,
+          text: m.text || "",
+          time: m.tsLabel || now(),
+          direction: m.fromEmail === user.email ? "out" : "in",
+        })),
+      }));
+    } catch (e) {
+      showToast("Imeshindwa kupakia ujumbe: " + e.message);
+    }
+    setBusy(false);
+  }
+
+  async function sendMessageTo(peerEmail, peerName, text) {
+    const cleanPeer = peerEmail.trim().toLowerCase();
+    if (cleanPeer === user.email) throw new Error("Hauwezi kujitumia ujumbe wewe mwenyewe.");
+
+    const peer = await firestoreFindUserByEmail(user.token, cleanPeer);
+    if (!peer) {
+      throw new Error("Hakuna mtumiaji aliyesajiliwa na barua pepe hiyo. Mwambie ajisajili GmailChat kwanza.");
+    }
+
+    const cid = convoId(user.email, cleanPeer);
+    // p1 = mwenye barua pepe ndogo kialfabeti, p2 = mwingine (uthabiti na convoId)
+    const sortedEmails = [user.email, cleanPeer].sort();
+    const isUserP1 = sortedEmails[0] === user.email;
+
+    await firestoreSendMessage(user.token, cid, {
+      fromEmail: user.email,
+      fromName: user.name,
+      toEmail: cleanPeer,
+      text,
+      ts: Date.now(),
+      tsLabel: now(),
     });
-  }
 
-  function downloadCSV() {
-    if (allData.length === 0) return;
-    let csv = "Namba,Taarifa,Password,Wakati\n";
-    allData.forEach((row, i) => {
-      const wakati   = row.wakati ? new Date(row.wakati.seconds * 1000).toLocaleString() : "";
-      const taarifa  = row.identifier || row.email || row.jina || row.simu || "";
-      csv += `${i+1},"${taarifa}","${row.password || ""}","${wakati}"\n`;
+    // Hifadhi/sasisha metadata ya mazungumzo - hii ndiyo inayowezesha
+    // pande zote mbili kuona thread hii kwenye inbox yao (query kwa email).
+    await firestoreUpsertConversation(user.token, cid, {
+      p1Email: sortedEmails[0],
+      p2Email: sortedEmails[1],
+      p1Name: isUserP1 ? user.name : (peer.name || peerName || cleanPeer.split("@")[0]),
+      p2Name: isUserP1 ? (peer.name || peerName || cleanPeer.split("@")[0]) : user.name,
+      lastTs: Date.now(),
+      lastMsg: text.slice(0, 60),
+      lastTime: now(),
     });
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href     = url;
-    a.download = "logins.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+
+    return cid;
   }
 
-  function toka() {
-    document.getElementById("adminPanel").style.display  = "none";
-    document.getElementById("loginScreen").style.display = "block";
-    document.getElementById("pinInput").value = "";
-    allData = [];
+  async function sendReply() {
+    if (!input.trim() || !active) return;
+    const txt = input.trim();
+    setInput("");
+    const tmp = { id: `tmp${Date.now()}`, from: "Wewe", text: txt, time: now(), direction: "out" };
+    setChats(c => ({ ...c, [active.id]: [...(c[active.id] || []), tmp] }));
+    setBusy(true);
+    try {
+      await sendMessageTo(active.email, active.name, txt);
+      setContacts(cs => cs.map(c => c.id === active.id ? { ...c, lastMsg: txt, lastTime: now() } : c));
+      showToast("Imetumwa ✓");
+    } catch (e) {
+      showToast("Imeshindwa ✗ " + e.message);
+    }
+    setBusy(false);
   }
 
-  document.getElementById("pinInput").addEventListener("keydown", e => {
-    if (e.key === "Enter") ingia();
-  });
+  async function sendNew() {
+    if (!ncEmail.trim() || !ncMsg.trim()) { showToast("Jaza email na ujumbe"); return; }
+    setBusy(true);
+    try {
+      const cid = await sendMessageTo(ncEmail.trim(), null, ncMsg.trim());
+      const newC = {
+        id: cid,
+        name: ncEmail.split("@")[0],
+        email: ncEmail.trim().toLowerCase(),
+        lastMsg: ncMsg.trim(),
+        lastTime: now(),
+        unread: 0,
+      };
+      setContacts(cs => [newC, ...cs.filter(c => c.id !== cid)]);
+      setChats(c => ({
+        ...c,
+        [cid]: [{ id: "tmp0", from: "Wewe", text: ncMsg.trim(), time: now(), direction: "out" }],
+      }));
+      setNcEmail(""); setNcMsg("");
+      setActive(newC); setView("chat");
+      showToast("Imetumwa ✓");
+    } catch (e) {
+      showToast("Hitilafu ✗ " + e.message);
+    }
+    setBusy(false);
+  }
 
-  window.ingia       = ingia;
-  window.toka        = toka;
-  window.downloadCSV = downloadCSV;
+  // Polling rahisi: pakua ujumbe upya kila sekunde 6 wakati chat iko wazi
+  useEffect(() => {
+    if (view === "chat" && active && user) {
+      pollRef.current = setInterval(() => { openThread(active); }, 6000);
+      return () => clearInterval(pollRef.current);
+    }
+  }, [view, active?.id, user?.uid]);
+
+  const activeChats = active ? (chats[active.id] || []) : [];
+
+  // ── Shell ──
+  return (
+    <div style={{
+      height: "100vh", display: "flex", flexDirection: "column",
+      background: S.bg, fontFamily: "Inter, Segoe UI, sans-serif",
+      maxWidth: 480, margin: "0 auto", position: "relative",
+      boxShadow: "0 0 40px rgba(0,0,0,0.12)", overflow: "hidden"
+    }}>
+
+      {toast && (
+        <div style={{
+          position: "absolute", top: 68, left: "50%", transform: "translateX(-50%)",
+          background: "rgba(0,0,0,0.72)", color: "#fff", padding: "8px 20px",
+          borderRadius: 20, fontSize: 13, zIndex: 999, whiteSpace: "nowrap",
+          pointerEvents: "none"
+        }}>{toast}</div>
+      )}
+
+      {/* ═══ NOT LOGGED IN ═══ */}
+      {!user && (
+        <>
+          <div style={{
+            background: S.white, padding: "14px 16px",
+            display: "flex", alignItems: "center",
+            borderBottom: `1px solid ${S.border}`,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)", flexShrink: 0
+          }}>
+            <span style={{ fontSize: 22, fontWeight: 800, color: S.green }}>Messages</span>
+          </div>
+          <LoginScreen onSubmit={handleAuthSubmit} busy={loginBusy} error={loginError} mode={authMode} setMode={setAuthMode} />
+        </>
+      )}
+
+      {/* ═══ LOGGED IN ═══ */}
+      {user && (
+        <>
+          {/* ── INBOX ── */}
+          {view === "inbox" && (
+            <>
+              <div style={{
+                background: S.white, padding: "12px 16px",
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                borderBottom: `1px solid ${S.border}`,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)", flexShrink: 0
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 22 }}>☰</span>
+                  <span style={{ fontSize: 21, fontWeight: 800, color: S.green }}>Messages</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ textAlign: "right", marginRight: 2 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: S.text }}>{user.name.split(" ")[0]}</div>
+                    <div style={{ fontSize: 10, color: S.sub }}>{user.email}</div>
+                  </div>
+                  <div style={{ position: "relative", cursor: "pointer" }} onClick={handleLogout} title="Toka">
+                    <Avatar name={user.name} size={36} />
+                    <div style={{
+                      position: "absolute", bottom: -2, right: -2,
+                      background: S.red, borderRadius: "50%",
+                      width: 14, height: 14, fontSize: 8,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#fff", border: `2px solid ${S.white}`
+                    }}>✕</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+                {contacts.length === 0 ? (
+                  <div style={{ padding: "60px 24px", textAlign: "center" }}>
+                    <div style={{ fontSize: 52, marginBottom: 14 }}>📭</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: S.text, marginBottom: 8 }}>
+                      Hakuna mazungumzo bado
+                    </div>
+                    <div style={{ fontSize: 13, color: S.sub, lineHeight: 1.7 }}>
+                      Bonyeza "Anza chat" kutuma ujumbe kwa barua pepe ya mtu
+                    </div>
+                    <button onClick={() => loadThreads()} disabled={busy} style={{
+                      marginTop: 20, background: S.green, color: "#fff", border: "none",
+                      padding: "12px 28px", borderRadius: 24, fontSize: 14, fontWeight: 700,
+                      cursor: "pointer", boxShadow: "0 3px 10px rgba(38,166,154,0.4)"
+                    }}>
+                      {busy ? "⏳ Inapakia..." : "🔄 Pakia mazungumzo"}
+                    </button>
+                  </div>
+                ) : (
+                  contacts.map(c => (
+                    <ContactRow key={c.id} contact={c} onClick={() => openThread(c)} />
+                  ))
+                )}
+              </div>
+
+              <div style={{
+                background: S.white, padding: "10px 20px",
+                borderTop: `1px solid ${S.border}`,
+                display: "flex", justifyContent: "flex-end", gap: 10,
+                flexShrink: 0
+              }}>
+                {contacts.length > 0 && (
+                  <button onClick={() => loadThreads()} disabled={busy} style={{
+                    background: "transparent", color: S.green,
+                    border: `1.5px solid ${S.green}`,
+                    padding: "8px 16px", borderRadius: 20,
+                    fontSize: 13, fontWeight: 600, cursor: "pointer"
+                  }}>🔄 Refresh</button>
+                )}
+                <button onClick={() => setView("newChat")} style={{
+                  background: S.green, color: "#fff", border: "none",
+                  padding: "10px 20px", borderRadius: 24,
+                  fontSize: 14, fontWeight: 700, cursor: "pointer",
+                  display: "flex", alignItems: "center", gap: 8,
+                  boxShadow: "0 4px 14px rgba(38,166,154,0.4)"
+                }}>✏️ Anza chat</button>
+              </div>
+            </>
+          )}
+
+          {/* ── CHAT ── */}
+          {view === "chat" && active && (
+            <>
+              <div style={{
+                background: S.white, padding: "12px 16px",
+                display: "flex", alignItems: "center", gap: 12,
+                borderBottom: `1px solid ${S.border}`,
+                boxShadow: "0 2px 6px rgba(0,0,0,0.06)", flexShrink: 0
+              }}>
+                <button onClick={() => { setView("inbox"); loadThreads(); }} style={{
+                  background: "none", border: "none", cursor: "pointer", fontSize: 20, color: S.green
+                }}>←</button>
+                <Avatar name={active.name} size={40} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: S.text }}>{active.name}</div>
+                  <div style={{ fontSize: 11, color: S.sub }}>{active.email}</div>
+                </div>
+                <button onClick={() => openThread(active)} style={{
+                  background: "none", border: "none", cursor: "pointer", fontSize: 18, color: S.sub
+                }} title="Reload">🔄</button>
+              </div>
+
+              <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "10px 0", background: "#ECE5DD" }}>
+                {busy && activeChats.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: 40, color: S.sub }}>
+                    <div style={{ fontSize: 28, marginBottom: 8 }}>⏳</div>Inapakia...
+                  </div>
+                ) : activeChats.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: 50, color: S.sub }}>
+                    <div style={{ fontSize: 44, marginBottom: 10 }}>✉️</div>
+                    <div>Hakuna ujumbe bado</div>
+                    <div style={{ fontSize: 12, marginTop: 4 }}>Tuma ujumbe wa kwanza</div>
+                  </div>
+                ) : (
+                  activeChats.map(msg => <Bubble key={msg.id} msg={msg} />)
+                )}
+                <div ref={endRef} />
+              </div>
+
+              <div style={{
+                background: S.white, padding: "10px 12px",
+                display: "flex", alignItems: "flex-end", gap: 8,
+                borderTop: `1px solid ${S.border}`, flexShrink: 0
+              }}>
+                <textarea value={input} onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
+                  placeholder={`Ujumbe kwa ${active.name}...`} rows={1}
+                  style={{
+                    flex: 1, background: S.input, border: "none",
+                    borderRadius: 20, padding: "10px 16px", fontSize: 16,
+                    color: S.text, resize: "none", outline: "none",
+                    fontFamily: "inherit", lineHeight: 1.5, maxHeight: 100, overflowY: "auto"
+                  }} />
+                <button onClick={sendReply} disabled={!input.trim() || busy} style={{
+                  background: input.trim() ? S.green : "#ccc", border: "none",
+                  color: "#fff", width: 42, height: 42, borderRadius: "50%",
+                  cursor: input.trim() ? "pointer" : "default", fontSize: 18,
+                  flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: input.trim() ? "0 2px 8px rgba(38,166,154,0.4)" : "none",
+                  transition: "all 0.2s"
+                }}>{busy ? "⏳" : "➤"}</button>
+              </div>
+            </>
+          )}
+
+          {/* ── NEW CHAT ── */}
+          {view === "newChat" && (
+            <>
+              <div style={{
+                background: S.white, padding: "14px 16px",
+                display: "flex", alignItems: "center", gap: 12,
+                borderBottom: `1px solid ${S.border}`,
+                boxShadow: "0 2px 6px rgba(0,0,0,0.06)", flexShrink: 0
+              }}>
+                <button onClick={() => setView("inbox")} style={{
+                  background: "none", border: "none", cursor: "pointer", fontSize: 20, color: S.green
+                }}>←</button>
+                <span style={{ fontSize: 18, fontWeight: 700, color: S.text }}>Ujumbe Mpya</span>
+              </div>
+
+              <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "20px 16px", background: S.bg }}>
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 12, color: S.sub, marginBottom: 5, fontWeight: 600 }}>Barua pepe ya mtu *</div>
+                  <input type="email" value={ncEmail} onChange={e => setNcEmail(e.target.value)} placeholder="mfano@gmail.com"
+                    style={{
+                      width: "100%", background: S.white, border: `1.5px solid ${S.border}`,
+                      borderRadius: 12, padding: "11px 14px", fontSize: 16,
+                      color: S.text, boxSizing: "border-box", outline: "none", fontFamily: "inherit"
+                    }}
+                    onFocus={e => e.target.style.borderColor = S.green}
+                    onBlur={e => e.target.style.borderColor = S.border}
+                  />
+                  <div style={{ fontSize: 11, color: S.sub, marginTop: 6 }}>
+                    Mtu huyu lazima awe tayari amejisajili kwenye GmailChat.
+                  </div>
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 12, color: S.sub, marginBottom: 5, fontWeight: 600 }}>Ujumbe *</div>
+                  <textarea value={ncMsg} onChange={e => setNcMsg(e.target.value)}
+                    placeholder="Andika ujumbe wako hapa..." rows={5}
+                    style={{
+                      width: "100%", background: S.white, border: `1.5px solid ${S.border}`,
+                      borderRadius: 12, padding: "11px 14px", fontSize: 16,
+                      color: S.text, boxSizing: "border-box", outline: "none",
+                      fontFamily: "inherit", resize: "vertical"
+                    }}
+                    onFocus={e => e.target.style.borderColor = S.green}
+                    onBlur={e => e.target.style.borderColor = S.border}
+                  />
+                </div>
+                <button onClick={sendNew} disabled={busy || !ncEmail.trim() || !ncMsg.trim()} style={{
+                  width: "100%",
+                  background: (ncEmail && ncMsg) ? S.green : "#ccc",
+                  color: "#fff", border: "none", padding: "14px",
+                  borderRadius: 24, fontSize: 16, fontWeight: 700,
+                  cursor: (ncEmail && ncMsg) ? "pointer" : "default",
+                  boxShadow: (ncEmail && ncMsg) ? "0 4px 14px rgba(38,166,154,0.4)" : "none",
+                  transition: "all 0.2s"
+                }}>
+                  {busy ? "⏳ Inatuma..." : "✉️ Tuma Ujumbe"}
+                </button>
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
 </script>
-
 </body>
 </html>
