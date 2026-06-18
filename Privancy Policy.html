@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Privacy Policy — VPN K</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  :root {
+    --bg:      #F4FFFE;
+    --white:   #FFFFFF;
+    --card:    #FFFFFF;
+    --teal:    #26A69A;
+    --teal2:   #00695C;
+    --cyan:    #00BCD4;
+    --dark:    #0A2E2A;
+    --text:    #1A3A36;
+    --sub:     #5A8A85;
+    --muted:   #9ABFBB;
+    --border:  #D0EDE9;
+    --red:     #E53935;
+    --amber:   #F57C00;
+    --green:   #2E7D32;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* subtle dot grid */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle, rgba(38,166,154,0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── SCROLL PROGRESS ── */
+  #progress {
+    position: fixed; top: 0; left: 0;
+    height: 3px; width: 0%;
+    background: linear-gradient(90deg, var(--teal), var(--cyan));
+    z-index: 9999;
+    box-shadow: 0 0 8px rgba(38,166,154,0.5);
+    transition: width 0.1s;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(244,255,254,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 13px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--teal), var(--teal2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(38,166,154,0.3);
+  }
+  .logo-text {
+    font-size: 18px; font-weight: 900;
+    color: var(--dark); letter-spacing: 0.4px;
+  }
+  .logo-text span { color: var(--teal); }
+
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--white); border: 1.5px solid var(--border);
+    color: var(--sub); padding: 7px 16px;
+    border-radius: 20px; font-size: 13px; font-weight: 600;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .back-btn:hover {
+    background: var(--teal); color: #fff;
+    border-color: var(--teal);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 60px 24px 44px;
+    max-width: 680px; margin: 0 auto;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(38,166,154,0.1);
+    border: 1px solid rgba(38,166,154,0.3);
+    padding: 6px 18px; border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    color: var(--teal); letter-spacing: 1.2px;
+    margin-bottom: 22px;
+  }
+
+  .hero h1 {
+    font-size: clamp(26px, 6vw, 40px);
+    font-weight: 900; line-height: 1.15;
+    color: var(--dark); margin-bottom: 14px;
+  }
+  .hero h1 span { color: var(--teal); }
+
+  .hero p {
+    font-size: 14.5px; color: var(--sub);
+    max-width: 500px; margin: 0 auto 28px;
+    line-height: 1.8;
+  }
+
+  .meta-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .meta-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--muted);
+    background: var(--white);
+    border: 1px solid var(--border);
+    padding: 5px 14px; border-radius: 12px;
+  }
+
+  /* ── TOC ── */
+  .toc-wrap {
+    position: relative; z-index: 1;
+    max-width: 760px; margin: 0 auto 44px;
+    padding: 0 20px;
+  }
+  .toc {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 18px; padding: 22px 26px;
+    box-shadow: 0 4px 20px rgba(38,166,154,0.07);
+  }
+  .toc-label {
+    font-size: 11px; font-weight: 800;
+    color: var(--teal); letter-spacing: 1.5px;
+    margin-bottom: 14px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+    gap: 8px;
+  }
+  .toc-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 13px; border-radius: 11px;
+    background: var(--bg);
+    text-decoration: none; color: var(--sub);
+    font-size: 13px; font-weight: 500;
+    border: 1px solid transparent;
+    transition: all 0.18s;
+  }
+  .toc-item:hover {
+    background: rgba(38,166,154,0.08);
+    color: var(--teal); border-color: rgba(38,166,154,0.2);
+  }
+  .toc-item .ti { font-size: 15px; }
+
+  /* ── MAIN ── */
+  main {
+    position: relative; z-index: 1;
+    max-width: 760px; margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ── SECTION ── */
+  .sec { margin-bottom: 44px; }
+
+  .sec-head {
+    display: flex; align-items: flex-start; gap: 15px;
+    margin-bottom: 20px; padding-bottom: 15px;
+    border-bottom: 2px solid var(--border);
+  }
+  .sec-icon {
+    min-width: 46px; height: 46px; border-radius: 13px;
+    background: linear-gradient(135deg, rgba(38,166,154,0.15), rgba(38,166,154,0.05));
+    border: 1.5px solid rgba(38,166,154,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .sec-title h2 {
+    font-size: 19px; font-weight: 800; color: var(--dark);
+    margin-bottom: 2px;
+  }
+  .sec-title p { font-size: 12px; color: var(--muted); font-weight: 500; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 15px; padding: 20px 22px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 12px rgba(38,166,154,0.05);
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(38,166,154,0.3); }
+
+  .card h3 {
+    font-size: 14.5px; font-weight: 700;
+    color: var(--dark); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { font-size: 13.5px; color: var(--sub); line-height: 1.75; }
+  .card ul {
+    list-style: none; padding: 0; margin-top: 8px;
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .card ul li {
+    font-size: 13.5px; color: var(--sub);
+    display: flex; align-items: flex-start; gap: 8px;
+    line-height: 1.65;
+  }
+  .card ul li::before {
+    content: "›";
+    color: var(--teal); font-weight: 800;
+    font-size: 16px; line-height: 1.4; flex-shrink: 0;
+  }
+
+  /* ── DATA TABLE ── */
+  .data-table {
+    width: 100%; border-collapse: collapse;
+    margin-top: 10px; font-size: 13px;
+  }
+  .data-table th {
+    background: rgba(38,166,154,0.08);
+    color: var(--teal); font-weight: 700;
+    padding: 10px 14px; text-align: left;
+    border-bottom: 2px solid var(--border);
+    font-size: 11px; letter-spacing: 0.8px;
+  }
+  .data-table td {
+    padding: 10px 14px; color: var(--sub);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top; line-height: 1.6;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(38,166,154,0.03); }
+
+  .badge {
+    display: inline-block; padding: 2px 9px;
+    border-radius: 8px; font-size: 10px;
+    font-weight: 700; letter-spacing: 0.5px;
+  }
+  .badge.yes  { background: rgba(46,125,50,0.1);  color: var(--green); }
+  .badge.no   { background: rgba(229,57,53,0.1);  color: var(--red);   }
+  .badge.maybe{ background: rgba(245,124,0,0.1);  color: var(--amber); }
+
+  /* ── ALERT ── */
+  .alert {
+    border-radius: 13px; padding: 15px 18px;
+    margin-bottom: 12px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .alert.info  { background: rgba(0,188,212,0.07); border: 1px solid rgba(0,188,212,0.25); }
+  .alert.warn  { background: rgba(245,124,0,0.07); border: 1px solid rgba(245,124,0,0.25); }
+  .alert.danger{ background: rgba(229,57,53,0.07); border: 1px solid rgba(229,57,53,0.25); }
+  .alert.green { background: rgba(46,125,50,0.07); border: 1px solid rgba(46,125,50,0.25); }
+
+  .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .alert-body strong {
+    display: block; font-size: 13px; font-weight: 700;
+    color: var(--dark); margin-bottom: 4px;
+  }
+  .alert-body p { font-size: 13px; color: var(--sub); line-height: 1.65; }
+
+  /* ── RIGHTS GRID ── */
+  .rights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px; margin-bottom: 12px;
+  }
+  .right-tile {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 18px 16px;
+    transition: all 0.2s;
+  }
+  .right-tile:hover {
+    border-color: var(--teal);
+    box-shadow: 0 4px 16px rgba(38,166,154,0.1);
+  }
+  .right-tile .rt-icon { font-size: 26px; margin-bottom: 8px; }
+  .right-tile .rt-title { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+  .right-tile .rt-desc  { font-size: 12px; color: var(--sub); line-height: 1.6; }
+
+  /* ── DIVIDER ── */
+  hr.div {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 36px 24px;
+    border-top: 1.5px solid var(--border);
+    background: var(--white);
+  }
+  .foot-logo { font-size: 22px; font-weight: 900; color: var(--dark); margin-bottom: 10px; }
+  .foot-logo span { color: var(--teal); }
+  .foot-links {
+    display: flex; justify-content: center;
+    gap: 18px; flex-wrap: wrap; margin: 12px 0;
+  }
+  .foot-links a {
+    font-size: 12px; color: var(--muted);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .foot-links a:hover { color: var(--teal); }
+  footer p { font-size: 12px; color: var(--muted); line-height: 1.8; }
+
+  @media (max-width: 520px) {
+    .toc-grid { grid-template-columns: 1fr 1fr; }
+    .rights-grid { grid-template-columns: 1fr 1fr; }
+    .data-table { font-size: 12px; }
+    .data-table th, .data-table td { padding: 8px 10px; }
+    header { padding: 11px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- HEADER -->
+<header>
+  <a href="VPN_K.html" class="logo">
+    <div class="logo-icon">🛡️</div>
+    <span class="logo-text">VPN <span>K</span></span>
+  </a>
+  <a href="VPN_K.html" class="back-btn">← Back to App</a>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🔒 PRIVACY POLICY</div>
+  <h1>Your Privacy Matters<br/>to <span>VPN K</span></h1>
+  <p>
+    This policy explains what data we collect, how we use it,
+    how we protect it, and what rights you have — written clearly
+    so you actually understand it.
+  </p>
+  <div class="meta-row">
+    <span class="meta-pill">🗓️ Effective: June 2025</span>
+    <span class="meta-pill">📄 Version 1.0</span>
+    <span class="meta-pill">🇹🇿 Applies in Tanzania & worldwide</span>
+  </div>
+</section>
+
+<!-- TOC -->
+<div class="toc-wrap">
+  <div class="toc">
+    <div class="toc-label">TABLE OF CONTENTS</div>
+    <div class="toc-grid">
+      <a href="#overview"   class="toc-item"><span class="ti">👁️</span> Overview</a>
+      <a href="#collect"    class="toc-item"><span class="ti">📥</span> Data We Collect</a>
+      <a href="#howuse"     class="toc-item"><span class="ti">⚙️</span> How We Use Data</a>
+      <a href="#gmail"      class="toc-item"><span class="ti">📧</span> Gmail & Identity</a>
+      <a href="#firebase"   class="toc-item"><span class="ti">🔥</span> Firebase & Google</a>
+      <a href="#storage"    class="toc-item"><span class="ti">💾</span> Storage & Cookies</a>
+      <a href="#sharing"    class="toc-item"><span class="ti">🤝</span> Data Sharing</a>
+      <a href="#security"   class="toc-item"><span class="ti">🔐</span> Security</a>
+      <a href="#retention"  class="toc-item"><span class="ti">🗓️</span> Data Retention</a>
+      <a href="#rights"     class="toc-item"><span class="ti">⚖️</span> Your Rights</a>
+      <a href="#children"   class="toc-item"><span class="ti">👶</span> Children</a>
+      <a href="#changes"    class="toc-item"><span class="ti">📝</span> Policy Changes</a>
+      <a href="#contact"    class="toc-item"><span class="ti">📞</span> Contact Us</a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- 1. OVERVIEW -->
+  <section class="sec" id="overview">
+    <div class="sec-head">
+      <div class="sec-icon">👁️</div>
+      <div class="sec-title">
+        <h2>Overview — What VPN K Is</h2>
+        <p>Understanding the app before understanding the policy</p>
+      </div>
+    </div>
+
+    <div class="alert info">
+      <span class="alert-icon">🛡️</span>
+      <div class="alert-body">
+        <strong>VPN K is a Secret Chat App Hidden as a VPN Simulator</strong>
+        <p>VPN K appears as a VPN application on the outside, but it is actually a private messaging platform that uses Gmail (email address) as your identity. The VPN interface is a simulator — it does not provide real network protection. The real functionality is the secure chat system accessed by tapping the 🔍 icon.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🏢 Who Is Responsible for Your Data</h3>
+      <p>VPN K is developed and operated as an independent application. For data-related enquiries, contact us at <strong style="color:var(--teal)">support@vpnk.app</strong>. We act as the data controller for all personal information processed through VPN K.</p>
+    </div>
+
+    <div class="card">
+      <h3>🌍 Where This Policy Applies</h3>
+      <p>This Privacy Policy applies to all users of VPN K worldwide, regardless of location. It is written in compliance with the principles of Tanzania's Electronic and Postal Communications Act and aligns with internationally recognised privacy standards including GDPR principles.</p>
+    </div>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 2. DATA WE COLLECT -->
+  <section class="sec" id="collect">
+    <div class="sec-head">
+      <div class="sec-icon">📥</div>
+      <div class="sec-title">
+        <h2>Data We Collect</h2>
+        <p>A full, honest breakdown of every piece of data we handle</p>
+      </div>
+    </div>
+
+    <table class="data-table card" style="padding:0; overflow:hidden;">
+      <thead>
+        <tr>
+          <th>DATA TYPE</th>
+          <th>WHAT EXACTLY</th>
+          <th>COLLECTED?</th>
+          <th>WHERE STORED</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Email Address</strong></td>
+          <td>Your Gmail or other email used to register</td>
+          <td><span class="badge yes">YES</span></td>
+          <td>Firebase Auth + Firestore</td>
+        </tr>
+        <tr>
+          <td><strong>Display Name</strong></td>
+          <td>Name you enter at signup</td>
+          <td><span class="badge yes">YES</span></td>
+          <td>Firebase Auth + Firestore</td>
+        </tr>
+        <tr>
+          <td><strong>Chat Messages</strong></td>
+          <td>Text messages sent and received</td>
+          <td><span class="badge yes">YES</span></td>
+          <td>Cloud Firestore</td>
+        </tr>
+        <tr>
+          <td><strong>Message Timestamps</strong></td>
+          <td>Date and time each message was sent</td>
+          <td><span class="badge yes">YES</span></td>
+          <td>Cloud Firestore</td>
+        </tr>
+        <tr>
+          <td><strong>Session Token</strong></td>
+          <td>Firebase refresh token for auto-login</td>
+          <td><span class="badge yes">YES</span></td>
+          <td>Browser localStorage</td>
+        </tr>
+        <tr>
+          <td><strong>Password</strong></td>
+          <td>Your account password</td>
+          <td><span class="badge no">NOT BY US</span></td>
+          <td>Firebase Auth only (hashed)</td>
+        </tr>
+        <tr>
+          <td><strong>Phone Number</strong></td>
+          <td>Your mobile number</td>
+          <td><span class="badge no">NEVER</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Location / GPS</strong></td>
+          <td>Your physical location</td>
+          <td><span class="badge no">NEVER</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Photos / Files</strong></td>
+          <td>Images or attachments</td>
+          <td><span class="badge no">NEVER</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Device Info</strong></td>
+          <td>Phone model, OS version</td>
+          <td><span class="badge no">NEVER</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>IP Address</strong></td>
+          <td>Your real internet IP</td>
+          <td><span class="badge maybe">GOOGLE ONLY</span></td>
+          <td>Firebase servers (Google)</td>
+        </tr>
+        <tr>
+          <td><strong>VPN Simulator Activity</strong></td>
+          <td>Which server you "connected" to in simulator</td>
+          <td><span class="badge no">NEVER</span></td>
+          <td>— (stays in browser only)</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 3. HOW WE USE DATA -->
+  <section class="sec" id="howuse">
+    <div class="sec-head">
+      <div class="sec-icon">⚙️</div>
+      <div class="sec-title">
+        <h2>How We Use Your Data</h2>
+        <p>Every purpose — stated clearly with no hidden agenda</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>✅ Legitimate Uses Only</h3>
+      <ul>
+        <li><strong>Authentication</strong> — Your email and password are used solely to verify your identity when you sign in or sign up.</li>
+        <li><strong>Delivering Messages</strong> — Your email address is used to route chat messages to the correct person and identify who sent them.</li>
+        <li><strong>Displaying Your Name</strong> — Your display name appears in the chat interface so your contacts can recognise you.</li>
+        <li><strong>Auto-Login</strong> — Your session token (stored in localStorage) allows the app to remember you between visits without re-entering your password.</li>
+        <li><strong>Unread Message Count</strong> — We track which messages have been opened to show the unread badge number on your inbox.</li>
+        <li><strong>App Improvement</strong> — Anonymised usage patterns may be used to fix bugs and improve user experience.</li>
+      </ul>
+    </div>
+
+    <div class="alert danger">
+      <span class="alert-icon">🚫</span>
+      <div class="alert-body">
+        <strong>We Will NEVER Do These Things With Your Data</strong>
+        <p>Sell your data to third parties · Use your data for advertising · Share your messages with anyone outside VPN K · Use your email for spam or marketing without consent · Build profiles to track you across the internet · Use your data to train AI models.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 4. GMAIL & IDENTITY -->
+  <section class="sec" id="gmail">
+    <div class="sec-head">
+      <div class="sec-icon">📧</div>
+      <div class="sec-title">
+        <h2>Gmail Address as Your Identity</h2>
+        <p>Special section: how your email address functions in VPN K</p>
+      </div>
+    </div>
+
+    <div class="alert warn">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-body">
+        <strong>Your Email Is Your Public VPN K Address</strong>
+        <p>Unlike traditional apps with usernames, VPN K uses your email address as your unique identifier. Anyone registered on VPN K who knows your email can send you a message. Please only share your VPN K email address with people you trust.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📧 What Happens to Your Gmail Address</h3>
+      <ul>
+        <li>It is stored in Firebase Authentication as your account identifier.</li>
+        <li>It is stored in a Firestore document so other users can find you by email to start a conversation.</li>
+        <li>It is never sent to any email marketing service, newsletter platform, or advertising network.</li>
+        <li>We never send automated emails to your Gmail address — no newsletters, no promotions, no password-reset spam unless you explicitly request a password reset.</li>
+        <li>We never access the contents of your Gmail inbox. VPN K only uses your Gmail address as a username — it has zero connection to your actual Gmail messages.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🔍 Email Lookup by Other Users</h3>
+      <p>When a user starts a new chat, they must enter the exact email address of the person they want to message. The app checks Firestore to confirm that email is registered. If it is, the conversation begins. <strong>No browsable user directory exists</strong> — users cannot search for or browse other users. Only exact-email lookup is possible.</p>
+    </div>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 5. FIREBASE & GOOGLE -->
+  <section class="sec" id="firebase">
+    <div class="sec-head">
+      <div class="sec-icon">🔥</div>
+      <div class="sec-title">
+        <h2>Firebase & Google — Third-Party Infrastructure</h2>
+        <p>The technology powering VPN K's backend</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔥 Firebase Authentication (Google LLC)</h3>
+      <p>VPN K uses Firebase Authentication to handle account creation, login, and session management. Firebase Authentication stores your email address and a securely hashed version of your password on Google's servers. We never see your password in plain text.</p>
+      <ul>
+        <li>Firebase project ID: <code style="background:rgba(38,166,154,0.08);color:var(--teal);padding:1px 6px;border-radius:4px;font-size:12px">smschat-af3e5</code></li>
+        <li>All auth requests go via: <code style="background:rgba(38,166,154,0.08);color:var(--teal);padding:1px 6px;border-radius:4px;font-size:12px">identitytoolkit.googleapis.com</code></li>
+        <li>Token refresh: <code style="background:rgba(38,166,154,0.08);color:var(--teal);padding:1px 6px;border-radius:4px;font-size:12px">securetoken.googleapis.com</code></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>☁️ Cloud Firestore (Google LLC)</h3>
+      <p>All messages, conversation threads, and user profile data (name + email) are stored in Google Cloud Firestore. Firestore Security Rules ensure each user can only read and write their own conversations — not those of other users.</p>
+    </div>
+
+    <div class="card">
+      <h3>📜 Google's Own Privacy Policies</h3>
+      <p>Because we use Firebase (a Google product), Google also processes some of your data under their own policies. We strongly recommend reading:</p>
+      <ul>
+        <li>Google Privacy Policy: <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--teal)">policies.google.com/privacy</a></li>
+        <li>Firebase Terms of Service: <a href="https://firebase.google.com/terms" target="_blank" style="color:var(--teal)">firebase.google.com/terms</a></li>
+      </ul>
+    </div>
+
+    <div class="alert warn">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-body">
+        <strong>Google May Log Your IP Address</strong>
+        <p>When your device communicates with Firebase servers, Google may log your IP address as part of standard server operation. This is outside our direct control. Refer to Google's Privacy Policy for details on how they handle server logs.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 6. STORAGE & COOKIES -->
+  <section class="sec" id="storage">
+    <div class="sec-head">
+      <div class="sec-icon">💾</div>
+      <div class="sec-title">
+        <h2>Local Storage & Session Data</h2>
+        <p>What we store on your device and why</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>💾 localStorage — Session Token</h3>
+      <p>VPN K stores one item in your browser's <code style="background:rgba(38,166,154,0.08);color:var(--teal);padding:1px 6px;border-radius:4px;font-size:12px">localStorage</code> under the key <code style="background:rgba(38,166,154,0.08);color:var(--teal);padding:1px 6px;border-radius:4px;font-size:12px">gmailchat_session</code>. This contains:</p>
+      <ul>
+        <li>Your Firebase User ID (uid)</li>
+        <li>Your display name and email</li>
+        <li>A Firebase refresh token (used to get new access tokens without re-entering your password)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🍪 Do We Use Cookies?</h3>
+      <p>VPN K itself does not set any tracking cookies. However, Firebase (Google) may set cookies as part of its authentication infrastructure when running in a web browser. These are functional cookies necessary for the app to work — not advertising or tracking cookies.</p>
+    </div>
+
+    <div class="card">
+      <h3>🗑️ How to Clear Session Data</h3>
+      <ul>
+        <li><strong>Log out</strong> from VPN K — this deletes the session token from localStorage immediately.</li>
+        <li><strong>Clear browser data</strong> — clearing site data in your browser will remove all locally stored session information.</li>
+        <li>After logout, the next app open will show the VPN K Simulator — you will need to sign in again.</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 7. DATA SHARING -->
+  <section class="sec" id="sharing">
+    <div class="sec-head">
+      <div class="sec-icon">🤝</div>
+      <div class="sec-title">
+        <h2>Data Sharing — Who Sees Your Data</h2>
+        <p>We share as little as possible, with as few parties as possible</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>👥 Other VPN K Users</h3>
+      <ul>
+        <li>People you chat with can see your <strong>display name</strong> and <strong>email address</strong> (they needed to know your email to find you).</li>
+        <li>They can see the <strong>text of messages</strong> you send them and the time you sent them.</li>
+        <li>They <strong>cannot</strong> see your password, your other conversations, or any account settings.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🔥 Google / Firebase</h3>
+      <p>As described above, Google processes your email, display name, and messages as part of providing Firebase Authentication and Firestore services. This is a necessary data sharing arrangement to operate the app.</p>
+    </div>
+
+    <div class="card">
+      <h3>⚖️ Legal Authorities</h3>
+      <p>We may disclose your data to law enforcement or judicial authorities if we receive a lawful, court-ordered request under Tanzanian law or applicable international treaties. We will notify you of such a request where legally permitted to do so.</p>
+    </div>
+
+    <div class="alert green">
+      <span class="alert-icon">✅</span>
+      <div class="alert-body">
+        <strong>No Advertising Partners. No Data Brokers. No Marketing Lists.</strong>
+        <p>VPN K has no advertising partners, does not sell data to data brokers, and does not share your information with any marketing or analytics companies. Full stop.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 8. SECURITY -->
+  <section class="sec" id="security">
+    <div class="sec-head">
+      <div class="sec-icon">🔐</div>
+      <div class="sec-title">
+        <h2>How We Protect Your Data</h2>
+        <p>Technical and organisational security measures</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔒 Encryption in Transit</h3>
+      <p>All communication between the VPN K app and Firebase servers is encrypted using <strong>TLS/HTTPS</strong>. This means your messages, login credentials, and all other data are encrypted while travelling over the internet — they cannot be read by anyone intercepting your network traffic.</p>
+    </div>
+
+    <div class="card">
+      <h3>☁️ Encryption at Rest</h3>
+      <p>Firebase (Google Cloud) encrypts all data stored in Firestore and Firebase Authentication at rest using AES-256 encryption. Your data is protected even if Google's physical servers were somehow accessed.</p>
+    </div>
+
+    <div class="card">
+      <h3>📋 Firestore Security Rules</h3>
+      <p>Server-side Security Rules on Firestore enforce that:</p>
+      <ul>
+        <li>Each user can only read and write their own conversation documents.</li>
+        <li>No user can read another user's messages — even with a valid token.</li>
+        <li>Unauthenticated requests are rejected entirely.</li>
+      </ul>
+    </div>
+
+    <div class="alert warn">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-body">
+        <strong>No End-to-End Encryption (E2EE)</strong>
+        <p>VPN K does NOT use end-to-end encryption. Messages are stored as readable text in Firestore. This means VPN K technical staff (and Google, under lawful order) could technically read message content. Do not send highly sensitive information such as passwords, banking details, or confidential legal matters via VPN K.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔑 Password Security</h3>
+      <p>Your password is <strong>never stored by VPN K</strong>. It is sent directly to Firebase Authentication, which stores only a securely hashed (bcrypt) version. Even our own developers cannot see your password.</p>
+    </div>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 9. DATA RETENTION -->
+  <section class="sec" id="retention">
+    <div class="sec-head">
+      <div class="sec-icon">🗓️</div>
+      <div class="sec-title">
+        <h2>How Long We Keep Your Data</h2>
+        <p>Data retention periods for every type of data we hold</p>
+      </div>
+    </div>
+
+    <table class="data-table card" style="padding:0; overflow:hidden;">
+      <thead>
+        <tr>
+          <th>DATA TYPE</th>
+          <th>RETENTION PERIOD</th>
+          <th>DELETED WHEN?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Account (email + name)</strong></td>
+          <td>Until account deleted</td>
+          <td>You request deletion or violate Terms</td>
+        </tr>
+        <tr>
+          <td><strong>Chat messages</strong></td>
+          <td>Until account deleted</td>
+          <td>Account deletion request processed</td>
+        </tr>
+        <tr>
+          <td><strong>Session token (localStorage)</strong></td>
+          <td>Until logout or browser clear</td>
+          <td>Immediately on logout</td>
+        </tr>
+        <tr>
+          <td><strong>Firebase Auth record</strong></td>
+          <td>Until account deleted</td>
+          <td>Account deletion request (up to 30 days)</td>
+        </tr>
+        <tr>
+          <td><strong>Backup snapshots</strong></td>
+          <td>Up to 30 days after deletion</td>
+          <td>Automatically purged by Firebase</td>
+        </tr>
+        <tr>
+          <td><strong>VPN Simulator activity</strong></td>
+          <td>Not stored — session memory only</td>
+          <td>Immediately when page closes</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 10. YOUR RIGHTS -->
+  <section class="sec" id="rights">
+    <div class="sec-head">
+      <div class="sec-icon">⚖️</div>
+      <div class="sec-title">
+        <h2>Your Privacy Rights</h2>
+        <p>Rights you have over your personal data — and how to exercise them</p>
+      </div>
+    </div>
+
+    <div class="rights-grid">
+      <div class="right-tile">
+        <div class="rt-icon">🔍</div>
+        <div class="rt-title">Right to Access</div>
+        <div class="rt-desc">Request a copy of all personal data we hold about you.</div>
+      </div>
+      <div class="right-tile">
+        <div class="rt-icon">✏️</div>
+        <div class="rt-title">Right to Rectify</div>
+        <div class="rt-desc">Correct inaccurate data — update your display name anytime.</div>
+      </div>
+      <div class="right-tile">
+        <div class="rt-icon">🗑️</div>
+        <div class="rt-title">Right to Erasure</div>
+        <div class="rt-desc">Request deletion of your account and all associated data.</div>
+      </div>
+      <div class="right-tile">
+        <div class="rt-icon">🚫</div>
+        <div class="rt-title">Right to Object</div>
+        <div class="rt-desc">Object to processing your data for purposes beyond app operation.</div>
+      </div>
+      <div class="right-tile">
+        <div class="rt-icon">📦</div>
+        <div class="rt-title">Right to Portability</div>
+        <div class="rt-desc">Receive your data in a machine-readable format on request.</div>
+      </div>
+      <div class="right-tile">
+        <div class="rt-icon">⏸️</div>
+        <div class="rt-title">Right to Restrict</div>
+        <div class="rt-desc">Request we limit how we process your data in certain circumstances.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📬 How to Exercise Your Rights</h3>
+      <p>Email us at <strong style="color:var(--teal)">support@vpnk.app</strong> with the subject line <em>"Privacy Rights Request"</em>. Include your registered email address for verification. We will respond within <strong>7 working days</strong> and complete your request within <strong>30 days</strong>.</p>
+    </div>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 11. CHILDREN -->
+  <section class="sec" id="children">
+    <div class="sec-head">
+      <div class="sec-icon">👶</div>
+      <div class="sec-title">
+        <h2>Children's Privacy</h2>
+        <p>Special protections for users under 18</p>
+      </div>
+    </div>
+
+    <div class="alert danger">
+      <span class="alert-icon">🚫</span>
+      <div class="alert-body">
+        <strong>VPN K is Not Intended for Children Under 13</strong>
+        <p>We do not knowingly collect personal data from children under 13. If we become aware that a child under 13 has created an account, we will immediately delete the account and all associated data. If you believe a child under 13 has registered, contact us at <strong style="color:var(--teal)">support@vpnk.app</strong> immediately.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>👨‍👩‍👧 Parental Guidance for Ages 13–17</h3>
+      <p>Users aged 13–17 may use VPN K with parental awareness and guidance. Parents are encouraged to review this Privacy Policy with their child and discuss responsible messaging practices. VPN K does not collect any additional data from minors beyond what is described in this policy.</p>
+    </div>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 12. POLICY CHANGES -->
+  <section class="sec" id="changes">
+    <div class="sec-head">
+      <div class="sec-icon">📝</div>
+      <div class="sec-title">
+        <h2>Changes to This Policy</h2>
+        <p>How and when we update this Privacy Policy</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📢 How We Notify You</h3>
+      <ul>
+        <li>The "Effective" date at the top of this page will be updated.</li>
+        <li>For significant changes affecting your rights, we will display a notice inside the VPN K app.</li>
+        <li>Continued use of VPN K after changes are posted constitutes acceptance of the updated policy.</li>
+        <li>If you disagree with changes, you may delete your account at any time — see the Terms of Use for instructions.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>📜 Previous Versions</h3>
+      <p>Previous versions of this Privacy Policy are available upon request. Email <strong style="color:var(--teal)">support@vpnk.app</strong> with the subject <em>"Previous Privacy Policy"</em>.</p>
+    </div>
+  </section>
+
+  <hr class="div"/>
+
+  <!-- 13. CONTACT -->
+  <section class="sec" id="contact">
+    <div class="sec-head">
+      <div class="sec-icon">📞</div>
+      <div class="sec-title">
+        <h2>Contact Us About Privacy</h2>
+        <p>We are here to answer any privacy questions</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📬 Data Protection Contact</h3>
+      <ul>
+        <li><strong>Email:</strong> <span style="color:var(--teal)">support@vpnk.app</span></li>
+        <li><strong>Subject for privacy matters:</strong> <em>"VPN K Privacy Request"</em></li>
+        <li><strong>Response time:</strong> Within 7 working days</li>
+        <li><strong>Language:</strong> English or Swahili accepted</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>🇹🇿 Governing Law</h3>
+      <p>This Privacy Policy is governed by the laws of the United Republic of Tanzania. Any disputes relating to this policy shall be resolved under Tanzanian jurisdiction. We also strive to align with international best practices including GDPR principles for our users worldwide.</p>
+    </div>
+
+    <div class="alert green">
+      <span class="alert-icon">✅</span>
+      <div class="alert-body">
+        <strong>Our Commitment to You</strong>
+        <p>VPN K is built on trust. We will always be transparent about what data we collect and why. We will never sell your data. We will always give you control over your information. Your privacy is not a feature — it is a foundation.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">VPN <span>K</span></div>
+  <div class="foot-links">
+    <a href="Terms.html">Terms of Use</a>
+    <a href="PrivacyPolicy.html">Privacy Policy</a>
+    <a href="Help & FAQ.html">Help & FAQ</a>
+    <a href="Contact Us.html">Contact</a>
+    <a href="About.html">About</a>
+    <a href="Security.html">Security</a>
+  </div>
+  <p>© 2025 VPN K · All rights reserved · Made in Tanzania 🇹🇿</p>
+</footer>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const el = document.getElementById('progress');
+    const st = document.documentElement.scrollTop;
+    const sh = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    el.style.width = (st / sh * 100) + '%';
+  });
+</script>
+
+</body>
+</html>
