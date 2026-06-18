@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>GmailChat</title>
+<title>VPN K</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; background: #F0EBE1; overflow: hidden; }
@@ -369,12 +369,379 @@ const S = {
   red: "#E53935",
 };
 
+// ─── VPN K Simulator ─────────────────────────────────────────────────────────
+const VPN_SERVERS = [
+  { country: "🇩🇪", name: "Germany", city: "Frankfurt", ping: 24, load: 18 },
+  { country: "🇺🇸", name: "USA", city: "New York", ping: 89, load: 45 },
+  { country: "🇯🇵", name: "Japan", city: "Tokyo", ping: 112, load: 31 },
+  { country: "🇸🇬", name: "Singapore", city: "Singapore", ping: 67, load: 52 },
+  { country: "🇬🇧", name: "UK", city: "London", ping: 41, load: 27 },
+  { country: "🇳🇱", name: "Netherlands", city: "Amsterdam", ping: 33, load: 22 },
+  { country: "🇨🇦", name: "Canada", city: "Toronto", ping: 95, load: 38 },
+  { country: "🇦🇺", name: "Australia", city: "Sydney", ping: 198, load: 15 },
+];
+
+function VpnSimulator({ onGoToLogin }) {
+  const [connected, setConnected] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [selectedServer, setSelectedServer] = useState(VPN_SERVERS[0]);
+  const [showServers, setShowServers] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  const [dataDown, setDataDown] = useState(0);
+  const [dataUp, setDataUp] = useState(0);
+  const [tab, setTab] = useState("home"); // home | servers | settings
+  const timerRef = React.useRef(null);
+
+  function fmtTime(s) {
+    const h = String(Math.floor(s / 3600)).padStart(2, "0");
+    const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+    const sc = String(s % 60).padStart(2, "0");
+    return `${h}:${m}:${sc}`;
+  }
+  function fmtData(mb) {
+    return mb < 1000 ? `${mb.toFixed(1)} MB` : `${(mb / 1024).toFixed(2)} GB`;
+  }
+
+  function handleConnect() {
+    if (connected) {
+      clearInterval(timerRef.current);
+      setConnected(false); setSeconds(0); setDataDown(0); setDataUp(0);
+      return;
+    }
+    setConnecting(true);
+    setTimeout(() => {
+      setConnecting(false); setConnected(true);
+      timerRef.current = setInterval(() => {
+        setSeconds(s => s + 1);
+        setDataDown(d => d + Math.random() * 0.8);
+        setDataUp(u => u + Math.random() * 0.2);
+      }, 1000);
+    }, 2200);
+  }
+
+  React.useEffect(() => () => clearInterval(timerRef.current), []);
+
+  const BG = connected ? "#0A1628" : "#0F1923";
+  const ACCENT = connected ? "#00E5FF" : "#26A69A";
+  const STATUS_COLOR = connecting ? "#FFB300" : connected ? "#00E676" : "#546E7A";
+  const STATUS_TEXT = connecting ? "Inaunganisha..." : connected ? "Umelindwa" : "Haujaunganishwa";
+
+  return (
+    <div style={{
+      height: "100vh", display: "flex", flexDirection: "column",
+      background: BG, fontFamily: "Inter, Segoe UI, sans-serif",
+      maxWidth: 480, margin: "0 auto", position: "relative",
+      overflow: "hidden", transition: "background 0.8s"
+    }}>
+      {/* Animated background circles */}
+      <div style={{
+        position: "absolute", top: -80, left: -80,
+        width: 300, height: 300, borderRadius: "50%",
+        background: connected ? "rgba(0,229,255,0.06)" : "rgba(38,166,154,0.05)",
+        transition: "background 1s", pointerEvents: "none"
+      }} />
+      <div style={{
+        position: "absolute", top: 60, right: -100,
+        width: 250, height: 250, borderRadius: "50%",
+        background: connected ? "rgba(0,229,255,0.04)" : "rgba(38,166,154,0.03)",
+        transition: "background 1s", pointerEvents: "none"
+      }} />
+
+      {/* ── TOP BAR ── */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "14px 20px", flexShrink: 0, position: "relative", zIndex: 10
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 8,
+            background: `linear-gradient(135deg,${ACCENT},#00695C)`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 16, transition: "background 0.8s"
+          }}>🛡️</div>
+          <span style={{ fontSize: 20, fontWeight: 800, color: "#fff", letterSpacing: 0.5 }}>VPN K</span>
+        </div>
+        {/* Search icon → goes to login */}
+        <button onClick={onGoToLogin} style={{
+          background: "rgba(255,255,255,0.1)", border: "none", cursor: "pointer",
+          width: 38, height: 38, borderRadius: "50%",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 18, color: "#fff", transition: "background 0.2s",
+          backdropFilter: "blur(4px)"
+        }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
+          onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+          title="Ingia kwenye VPN K Chat"
+        >🔍</button>
+      </div>
+
+      {/* ── TAB NAV ── */}
+      <div style={{
+        display: "flex", gap: 4, padding: "0 20px 14px",
+        flexShrink: 0, position: "relative", zIndex: 10
+      }}>
+        {[
+          { id: "home", label: "Nyumbani", icon: "🏠" },
+          { id: "servers", label: "Seva", icon: "🌐" },
+          { id: "settings", label: "Mipangilio", icon: "⚙️" },
+        ].map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            flex: 1, padding: "8px 4px",
+            background: tab === t.id ? `rgba(${connected ? "0,229,255" : "38,166,154"},0.18)` : "rgba(255,255,255,0.06)",
+            border: tab === t.id ? `1px solid ${ACCENT}40` : "1px solid transparent",
+            borderRadius: 10, cursor: "pointer",
+            color: tab === t.id ? ACCENT : "rgba(255,255,255,0.5)",
+            fontSize: 11, fontWeight: 600, transition: "all 0.2s",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 2
+          }}>
+            <span style={{ fontSize: 16 }}>{t.icon}</span>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ══════ TAB: HOME ══════ */}
+      {tab === "home" && (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", overflowY: "auto", padding: "0 20px 20px", position: "relative", zIndex: 10 }}>
+
+          {/* Status badge */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8,
+            background: "rgba(255,255,255,0.07)", borderRadius: 20,
+            padding: "6px 16px", marginBottom: 28,
+            border: `1px solid ${STATUS_COLOR}40`
+          }}>
+            <div style={{
+              width: 8, height: 8, borderRadius: "50%",
+              background: STATUS_COLOR,
+              boxShadow: `0 0 8px ${STATUS_COLOR}`,
+              animation: connecting ? "pulse 0.8s infinite" : "none"
+            }} />
+            <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}`}</style>
+            <span style={{ fontSize: 13, color: STATUS_COLOR, fontWeight: 600 }}>{STATUS_TEXT}</span>
+          </div>
+
+          {/* Big connect button */}
+          <div style={{ position: "relative", marginBottom: 32 }}>
+            {/* Outer ring */}
+            {connected && (
+              <div style={{
+                position: "absolute", inset: -16, borderRadius: "50%",
+                border: `2px solid ${ACCENT}30`,
+                animation: "ringPulse 2s infinite"
+              }} />
+            )}
+            {connected && (
+              <div style={{
+                position: "absolute", inset: -28, borderRadius: "50%",
+                border: `1px solid ${ACCENT}15`,
+                animation: "ringPulse 2s infinite 0.5s"
+              }} />
+            )}
+            <style>{`@keyframes ringPulse{0%{transform:scale(1);opacity:1}100%{transform:scale(1.15);opacity:0}}`}</style>
+            <button onClick={handleConnect} disabled={connecting} style={{
+              width: 160, height: 160, borderRadius: "50%",
+              background: connecting
+                ? "radial-gradient(circle,#1A2E3A,#0F1F2A)"
+                : connected
+                  ? `radial-gradient(circle,#003344,#001822)`
+                  : "radial-gradient(circle,#1B2E3A,#0D1E2A)",
+              border: `3px solid ${connecting ? "#FFB300" : connected ? ACCENT : "#26A69A"}`,
+              cursor: connecting ? "default" : "pointer",
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center", gap: 8,
+              boxShadow: connected ? `0 0 40px ${ACCENT}50, 0 0 80px ${ACCENT}20` : "0 8px 32px rgba(0,0,0,0.5)",
+              transition: "all 0.5s",
+            }}>
+              <span style={{ fontSize: 42 }}>{connecting ? "⏳" : connected ? "🔓" : "🔒"}</span>
+              <span style={{
+                fontSize: 13, fontWeight: 700,
+                color: connecting ? "#FFB300" : connected ? ACCENT : "#90A4AE",
+                letterSpacing: 1
+              }}>
+                {connecting ? "SUBIRI..." : connected ? "KATA" : "UNGANISHA"}
+              </span>
+            </button>
+          </div>
+
+          {/* Timer & data stats */}
+          {connected && (
+            <div style={{
+              display: "flex", gap: 12, marginBottom: 24, width: "100%"
+            }}>
+              {[
+                { label: "Muda", value: fmtTime(seconds), icon: "⏱️" },
+                { label: "Kupakua", value: fmtData(dataDown), icon: "⬇️" },
+                { label: "Kupakia", value: fmtData(dataUp), icon: "⬆️" },
+              ].map((s, i) => (
+                <div key={i} style={{
+                  flex: 1, background: "rgba(0,229,255,0.07)",
+                  borderRadius: 12, padding: "10px 6px", textAlign: "center",
+                  border: "1px solid rgba(0,229,255,0.15)"
+                }}>
+                  <div style={{ fontSize: 18, marginBottom: 3 }}>{s.icon}</div>
+                  <div style={{ fontSize: 12, color: ACCENT, fontWeight: 700 }}>{s.value}</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Selected server card */}
+          <div style={{
+            width: "100%", background: "rgba(255,255,255,0.06)",
+            borderRadius: 16, padding: "16px 18px",
+            border: `1px solid rgba(255,255,255,0.1)`, marginBottom: 12
+          }}>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 10, fontWeight: 600, letterSpacing: 1 }}>SEVA ILIYOCHAGULIWA</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <span style={{ fontSize: 36 }}>{selectedServer.country}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>{selectedServer.name}</div>
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>{selectedServer.city}</div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 13, color: ACCENT, fontWeight: 700 }}>{selectedServer.ping} ms</div>
+                <div style={{
+                  fontSize: 10, color: selectedServer.load < 30 ? "#00E676" : selectedServer.load < 60 ? "#FFB300" : "#FF5252",
+                  marginTop: 2
+                }}>Mzigo {selectedServer.load}%</div>
+              </div>
+            </div>
+          </div>
+
+          {/* IP info */}
+          <div style={{
+            width: "100%", background: "rgba(255,255,255,0.04)",
+            borderRadius: 12, padding: "12px 16px",
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            border: "1px solid rgba(255,255,255,0.07)"
+          }}>
+            <div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", letterSpacing: 1 }}>ANWANI YAKO YA IP</div>
+              <div style={{ fontSize: 14, color: connected ? ACCENT : "rgba(255,255,255,0.6)", fontWeight: 700, marginTop: 3 }}>
+                {connected ? `${selectedServer.city.slice(0,3).toUpperCase()}.***.***.${Math.floor(Math.random()*99+1)}` : "---"}
+              </div>
+            </div>
+            <div style={{
+              fontSize: 11, padding: "5px 12px", borderRadius: 20,
+              background: connected ? "rgba(0,230,118,0.15)" : "rgba(255,82,82,0.15)",
+              color: connected ? "#00E676" : "#FF5252", fontWeight: 700
+            }}>
+              {connected ? "✓ Imelindwa" : "✗ Wazi"}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══════ TAB: SERVERS ══════ */}
+      {tab === "servers" && (
+        <div style={{ flex: 1, overflowY: "auto", padding: "0 16px 20px", position: "relative", zIndex: 10 }}>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", letterSpacing: 1, marginBottom: 12, paddingLeft: 4 }}>
+            SEVA ZINAZOPATIKANA — {VPN_SERVERS.length}
+          </div>
+          {VPN_SERVERS.map((srv, i) => (
+            <div key={i} onClick={() => { setSelectedServer(srv); setTab("home"); }}
+              style={{
+                display: "flex", alignItems: "center", gap: 12,
+                padding: "14px 16px", borderRadius: 14, marginBottom: 8, cursor: "pointer",
+                background: selectedServer.name === srv.name
+                  ? `rgba(${connected ? "0,229,255" : "38,166,154"},0.12)`
+                  : "rgba(255,255,255,0.05)",
+                border: selectedServer.name === srv.name
+                  ? `1px solid ${ACCENT}50` : "1px solid rgba(255,255,255,0.07)",
+                transition: "all 0.15s"
+              }}>
+              <span style={{ fontSize: 28 }}>{srv.country}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{srv.name}</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>{srv.city}</div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 13, color: srv.ping < 50 ? "#00E676" : srv.ping < 100 ? "#FFB300" : "#FF5252", fontWeight: 700 }}>
+                  {srv.ping} ms
+                </div>
+                <div style={{
+                  fontSize: 10, marginTop: 2,
+                  color: srv.load < 30 ? "#00E676" : srv.load < 60 ? "#FFB300" : "#FF5252"
+                }}>{srv.load}% mzigo</div>
+              </div>
+              {selectedServer.name === srv.name && (
+                <span style={{ fontSize: 16, color: ACCENT }}>✓</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ══════ TAB: SETTINGS ══════ */}
+      {tab === "settings" && (
+        <div style={{ flex: 1, overflowY: "auto", padding: "0 16px 20px", position: "relative", zIndex: 10 }}>
+          {[
+            { icon: "🔐", label: "Itifaki ya Usalama", value: "WireGuard" },
+            { icon: "🚫", label: "Kizuizi cha Matangazo", value: "Imewashwa" },
+            { icon: "🌙", label: "Muundo wa Giza", value: "Daima" },
+            { icon: "🔁", label: "Unganisha Kiotomatiki", value: "Imewashwa" },
+            { icon: "📊", label: "Muundo wa Data", value: "AES-256" },
+            { icon: "🌍", label: "DNS ya Faragha", value: "1.1.1.1" },
+          ].map((item, i) => (
+            <div key={i} style={{
+              display: "flex", alignItems: "center", gap: 14,
+              padding: "15px 16px", borderRadius: 14, marginBottom: 8,
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.07)"
+            }}>
+              <span style={{ fontSize: 22, width: 30, textAlign: "center" }}>{item.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, color: "#fff", fontWeight: 500 }}>{item.label}</div>
+              </div>
+              <div style={{
+                fontSize: 12, color: ACCENT, fontWeight: 600,
+                background: `rgba(${connected ? "0,229,255" : "38,166,154"},0.1)`,
+                padding: "4px 10px", borderRadius: 10
+              }}>{item.value}</div>
+            </div>
+          ))}
+
+          {/* About VPN K */}
+          <div style={{
+            marginTop: 16, padding: "16px", borderRadius: 14,
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            textAlign: "center"
+          }}>
+            <div style={{ fontSize: 28, marginBottom: 8 }}>🛡️</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", marginBottom: 4 }}>VPN K</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.7 }}>
+              Toleo 3.0 · Seva 8+ · Nchi 8<br/>Salama · Bila Kuhifadhi Kumbukumbu
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── BOTTOM: hint to go to chat ── */}
+      <div style={{
+        padding: "12px 20px 20px", textAlign: "center", flexShrink: 0, position: "relative", zIndex: 10
+      }}>
+        <button onClick={onGoToLogin} style={{
+          background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
+          color: "rgba(255,255,255,0.5)", padding: "8px 24px", borderRadius: 20,
+          cursor: "pointer", fontSize: 12, fontWeight: 500,
+          backdropFilter: "blur(4px)"
+        }}>
+          🔍 Ingia kwenye VPN K Chat
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Hamburger Menu Drawer ───────────────────────────────────────────────────
 const MENU_LINKS = [
   { icon: "📜", label: "Terms & Use", file: "Terms & Use.html" },
   { icon: "🔒", label: "Sera ya Faragha", file: "Privacy Policy.html" },
   { icon: "❓", label: "Msaada & FAQ", file: "Help & FAQ.html" },
-  { icon: "ℹ️", label: "Kuhusu GmailChat", file: "About.html" },
+  { icon: "ℹ️", label: "Kuhusu VPN K", file: "About.html" },
   { icon: "📞", label: "Wasiliana Nasi", file: "Contact Us.html" },
   { icon: "🛡️", label: "Usalama", file: "Security.html" },
 ];
@@ -447,7 +814,7 @@ function HamburgerDrawer({ open, onClose, userName, userEmail }) {
           borderTop: `1px solid ${S.border}`,
           fontSize: 12, color: S.sub, textAlign: "center"
         }}>
-          GmailChat v1.0 · Powered by SadeHub
+          VPN K v1.0 · Powered by SadeHub
         </div>
       </div>
     </>
@@ -569,7 +936,7 @@ function LoginScreen({ onSubmit, busy, error, mode, setMode }) {
       <h1 style={{
         fontSize: 28, fontWeight: 800, color: S.text,
         margin: "0 0 8px", textAlign: "center"
-      }}>GmailChat</h1>
+      }}>VPN K</h1>
       <p style={{
         fontSize: 14, color: S.sub, textAlign: "center",
         margin: "0 0 28px", lineHeight: 1.7, maxWidth: 280
@@ -660,6 +1027,7 @@ function App() {
   const [loginError, setLoginError] = useState("");
   const [authMode, setAuthMode] = useState("login"); // login | signup
 
+  const [appScreen, setAppScreen] = useState("vpn"); // vpn | login | chat
   const [view, setView] = useState("inbox");        // inbox | chat | newChat
   const [contacts, setContacts] = useState([]);
   const [active, setActive] = useState(null);
@@ -692,6 +1060,7 @@ function App() {
           };
           setUser(restoredUser);
           await saveSession({ uid: restoredUser.uid, name: restoredUser.name, email: restoredUser.email, refreshToken: r.refresh_token });
+          setAppScreen("chat");
           loadThreads(restoredUser);
         } catch (e) {
           await clearSession();
@@ -748,6 +1117,7 @@ function App() {
       });
 
       showToast(`Karibu, ${displayName.split(" ")[0]}! ✓`);
+      setAppScreen("chat");
       loadThreads(newUser);
     } catch (e) {
       setLoginError(e.message || "Imeshindwa. Jaribu tena.");
@@ -831,7 +1201,7 @@ function App() {
 
     const peer = await firestoreFindUserByEmail(user.token, cleanPeer);
     if (!peer) {
-      throw new Error("Hakuna mtumiaji aliyesajiliwa na barua pepe hiyo. Mwambie ajisajili GmailChat kwanza.");
+      throw new Error("Hakuna mtumiaji aliyesajiliwa na barua pepe hiyo. Mwambie ajisajili VPN K kwanza.");
     }
 
     const cid = convoId(user.email, cleanPeer);
@@ -935,6 +1305,16 @@ function App() {
   const activeChats = active ? (chats[active.id] || []) : [];
 
   // ── Shell ──
+  // Kama bado tunaangalia kikao, ruhusu kwa sababu checkingSession itatoa jibu hivi karibuni.
+  // VPN screen inaonekana kama appScreen === "vpn"
+  if (appScreen === "vpn") {
+    return (
+      <div style={{ height: "100vh", maxWidth: 480, margin: "0 auto" }}>
+        <VpnSimulator onGoToLogin={() => setAppScreen("login")} />
+      </div>
+    );
+  }
+
   return (
     <div style={{
       height: "100vh", display: "flex", flexDirection: "column",
@@ -960,7 +1340,7 @@ function App() {
       )}
 
       {/* ═══ INAKAGUA KIKAO KILICHOHIFADHIWA ═══ */}
-      {checkingSession && (
+      {checkingSession && appScreen !== "vpn" && (
         <div style={{
           flex: 1, display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center", background: S.bg
@@ -971,22 +1351,29 @@ function App() {
       )}
 
       {/* ═══ NOT LOGGED IN ═══ */}
-      {!checkingSession && !user && (
+      {(!checkingSession && !user) || appScreen === "login" ? (
         <>
           <div style={{
             background: S.white, padding: "14px 16px",
-            display: "flex", alignItems: "center",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
             borderBottom: `1px solid ${S.border}`,
             boxShadow: "0 2px 8px rgba(0,0,0,0.06)", flexShrink: 0
           }}>
-            <span style={{ fontSize: 22, fontWeight: 800, color: S.green }}>Messages</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 20 }}>🛡️</span>
+              <span style={{ fontSize: 20, fontWeight: 800, color: S.green }}>VPN K Chat</span>
+            </div>
+            <button onClick={() => setAppScreen("vpn")} style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: 13, color: S.sub, display: "flex", alignItems: "center", gap: 4
+            }}>← Rudi VPN</button>
           </div>
           <LoginScreen onSubmit={handleAuthSubmit} busy={loginBusy} error={loginError} mode={authMode} setMode={setAuthMode} />
         </>
-      )}
+      ) : null}
 
       {/* ═══ LOGGED IN ═══ */}
-      {!checkingSession && user && (
+      {!checkingSession && user && appScreen === "chat" && (
         <>
           {/* ── INBOX ── */}
           {view === "inbox" && (
@@ -1167,7 +1554,7 @@ function App() {
                     onBlur={e => e.target.style.borderColor = S.border}
                   />
                   <div style={{ fontSize: 11, color: S.sub, marginTop: 6 }}>
-                    Mtu huyu lazima awe tayari amejisajili kwenye GmailChat.
+                    Mtu huyu lazima awe tayari amejisajili kwenye VPN K.
                   </div>
                 </div>
                 <div style={{ marginBottom: 20 }}>
