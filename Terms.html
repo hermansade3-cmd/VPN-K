@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Masharti ya Matumizi — VPN K</title>
+<title>Terms of Use — VPN K</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
   :root {
-    --dark:    #0A1628;
-    --darker:  #060E1A;
-    --card:    #111D30;
-    --border:  rgba(0,229,255,0.12);
-    --cyan:    #00E5FF;
-    --green:   #00E676;
-    --amber:   #FFB300;
-    --white:   #FFFFFF;
-    --muted:   rgba(255,255,255,0.45);
-    --dim:     rgba(255,255,255,0.08);
+    --dark:    #FFFFFF;
+    --darker:  #F4F7FA;
+    --card:    #F8FAFC;
+    --border:  rgba(0,150,170,0.15);
+    --cyan:    #0098A8;
+    --green:   #00A859;
+    --amber:   #B97400;
+    --white:   #0A1628;
+    --muted:   rgba(10,22,40,0.6);
+    --dim:     rgba(0,150,170,0.06);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,8 +39,8 @@
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(0,150,170,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,150,170,0.04) 1px, transparent 1px);
     background-size: 48px 48px;
     pointer-events: none;
     z-index: 0;
@@ -51,7 +51,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(10,22,40,0.92);
+    background: rgba(255,255,255,0.92);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     padding: 14px 24px;
@@ -78,7 +78,7 @@
     justify-content: center;
     font-size: 18px;
     flex-shrink: 0;
-    box-shadow: 0 0 16px rgba(0,229,255,0.3);
+    box-shadow: 0 0 16px rgba(0,150,170,0.25);
   }
 
   .logo-text {
@@ -108,7 +108,7 @@
   }
 
   .back-btn:hover {
-    background: rgba(0,229,255,0.1);
+    background: rgba(0,150,170,0.1);
     color: var(--cyan);
     border-color: var(--cyan);
   }
@@ -127,8 +127,8 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(0,229,255,0.08);
-    border: 1px solid rgba(0,229,255,0.25);
+    background: rgba(0,150,170,0.08);
+    border: 1px solid rgba(0,150,170,0.25);
     padding: 6px 18px;
     border-radius: 20px;
     font-size: 12px;
@@ -147,7 +147,7 @@
 
   .hero h1 .highlight {
     color: var(--cyan);
-    text-shadow: 0 0 32px rgba(0,229,255,0.4);
+    text-shadow: 0 0 32px rgba(0,150,170,0.25);
   }
 
   .hero p {
@@ -163,8 +163,8 @@
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    color: rgba(255,255,255,0.3);
-    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(10,22,40,0.4);
+    border: 1px solid rgba(10,22,40,0.1);
     padding: 5px 14px;
     border-radius: 12px;
   }
@@ -207,7 +207,7 @@
     border-radius: 10px;
     background: var(--dim);
     text-decoration: none;
-    color: rgba(255,255,255,0.65);
+    color: rgba(10,22,40,0.7);
     font-size: 13px;
     font-weight: 500;
     transition: all 0.18s;
@@ -215,9 +215,9 @@
   }
 
   .toc-item:hover {
-    background: rgba(0,229,255,0.08);
+    background: rgba(0,150,170,0.08);
     color: var(--cyan);
-    border-color: rgba(0,229,255,0.2);
+    border-color: rgba(0,150,170,0.2);
   }
 
   .toc-icon { font-size: 16px; flex-shrink: 0; }
@@ -249,8 +249,8 @@
     min-width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(0,229,255,0.05));
-    border: 1px solid rgba(0,229,255,0.3);
+    background: linear-gradient(135deg, rgba(0,150,170,0.15), rgba(0,150,170,0.05));
+    border: 1px solid rgba(0,150,170,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -289,7 +289,7 @@
     transition: border-color 0.2s;
   }
 
-  .step-card:hover { border-color: rgba(0,229,255,0.3); }
+  .step-card:hover { border-color: rgba(0,150,170,0.3); }
 
   .step-bubble {
     width: 38px;
@@ -301,9 +301,9 @@
     justify-content: center;
     font-size: 15px;
     font-weight: 900;
-    color: var(--dark);
+    color: #FFFFFF;
     flex-shrink: 0;
-    box-shadow: 0 0 12px rgba(0,229,255,0.3);
+    box-shadow: 0 0 12px rgba(0,150,170,0.25);
   }
 
   .step-body h3 {
@@ -321,8 +321,8 @@
 
   .step-tag {
     display: inline-block;
-    background: rgba(0,230,118,0.1);
-    border: 1px solid rgba(0,230,118,0.25);
+    background: rgba(0,168,89,0.1);
+    border: 1px solid rgba(0,168,89,0.25);
     color: var(--green);
     font-size: 10px;
     font-weight: 700;
@@ -333,14 +333,14 @@
   }
 
   .step-tag.amber {
-    background: rgba(255,179,0,0.1);
-    border-color: rgba(255,179,0,0.25);
+    background: rgba(185,116,0,0.1);
+    border-color: rgba(185,116,0,0.25);
     color: var(--amber);
   }
 
   .step-tag.cyan {
-    background: rgba(0,229,255,0.1);
-    border-color: rgba(0,229,255,0.25);
+    background: rgba(0,150,170,0.1);
+    border-color: rgba(0,150,170,0.25);
     color: var(--cyan);
   }
 
@@ -396,18 +396,18 @@
   }
 
   .alert.warn {
-    background: rgba(255,179,0,0.07);
-    border: 1px solid rgba(255,179,0,0.25);
+    background: rgba(185,116,0,0.06);
+    border: 1px solid rgba(185,116,0,0.25);
   }
 
   .alert.danger {
-    background: rgba(255,82,82,0.07);
-    border: 1px solid rgba(255,82,82,0.25);
+    background: rgba(214,48,48,0.06);
+    border: 1px solid rgba(214,48,48,0.25);
   }
 
   .alert.info {
-    background: rgba(0,229,255,0.06);
-    border: 1px solid rgba(0,229,255,0.2);
+    background: rgba(0,150,170,0.05);
+    border: 1px solid rgba(0,150,170,0.2);
   }
 
   .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
@@ -446,8 +446,8 @@
   }
 
   .feature-tile:hover {
-    border-color: rgba(0,229,255,0.35);
-    background: rgba(0,229,255,0.04);
+    border-color: rgba(0,150,170,0.35);
+    background: rgba(0,150,170,0.04);
   }
 
   .feature-tile .tile-icon { font-size: 28px; margin-bottom: 8px; }
@@ -490,7 +490,7 @@
 
   footer p {
     font-size: 12px;
-    color: rgba(255,255,255,0.3);
+    color: rgba(10,22,40,0.4);
     line-height: 1.8;
   }
 
@@ -504,7 +504,7 @@
 
   footer .footer-links a {
     font-size: 12px;
-    color: rgba(255,255,255,0.4);
+    color: rgba(10,22,40,0.5);
     text-decoration: none;
     transition: color 0.2s;
   }
@@ -520,7 +520,7 @@
     width: 0%;
     z-index: 9999;
     transition: width 0.1s;
-    box-shadow: 0 0 8px rgba(0,229,255,0.6);
+    box-shadow: 0 0 8px rgba(0,150,170,0.4);
   }
 
   /* ── Mobile ── */
@@ -544,41 +544,41 @@
     <div class="logo-shield">🛡️</div>
     <span class="logo-text">VPN <span>K</span></span>
   </a>
-  <a href="VPN_K.html" class="back-btn">← Rudi App</a>
+  <a href="VPN_K.html" class="back-btn">← Back to App</a>
 </header>
 
 <!-- ── HERO ── -->
 <section class="hero">
-  <div class="hero-badge">📜 MASHARTI YA MATUMIZI</div>
-  <h1>Sheria na Mwongozo wa<br/><span class="highlight">VPN K</span></h1>
+  <div class="hero-badge">📜 TERMS OF USE</div>
+  <h1>Rules and Guidelines for<br/><span class="highlight">VPN K</span></h1>
   <p>
-    Tafadhali soma kwa makini kabla ya kutumia huduma yetu.
-    Hati hii inafafanua jinsi ya kutumia VPN K, haki zako,
-    wajibu wako, na mipaka ya huduma yetu.
+    Please read carefully before using our service.
+    This document explains how to use VPN K, your rights,
+    your responsibilities, and the limits of our service.
   </p>
-  <span class="last-updated">🗓️ Ilisasishwa: Juni 2025 · Toleo 1.0</span>
+  <span class="last-updated">🗓️ Last updated: June 2025 · Version 1.0</span>
 </section>
 
 <!-- ── TABLE OF CONTENTS ── -->
 <div class="toc-wrapper">
   <div class="toc">
-    <div class="toc-title">YALIYOMO</div>
+    <div class="toc-title">TABLE OF CONTENTS</div>
     <div class="toc-grid">
-      <a href="#jinsi" class="toc-item"><span class="toc-icon">🗺️</span> Jinsi ya Kutumia</a>
+      <a href="#jinsi" class="toc-item"><span class="toc-icon">🗺️</span> How to Use</a>
       <a href="#vpnsim" class="toc-item"><span class="toc-icon">🛡️</span> VPN K Simulator</a>
-      <a href="#akaunti" class="toc-item"><span class="toc-icon">🔐</span> Akaunti na Usajili</a>
-      <a href="#chat" class="toc-item"><span class="toc-icon">💬</span> Huduma ya Chat</a>
-      <a href="#faragha" class="toc-item"><span class="toc-icon">🔒</span> Faragha ya Data</a>
-      <a href="#gmail" class="toc-item"><span class="toc-icon">📧</span> Gmail na Utambulisho</a>
-      <a href="#siri" class="toc-item"><span class="toc-icon">🤫</span> Usiri wa Mazungumzo</a>
-      <a href="#usalama" class="toc-item"><span class="toc-icon">🛡️</span> Usalama wa Akaunti</a>
-      <a href="#watoto" class="toc-item"><span class="toc-icon">👶</span> Ulinzi wa Watoto</a>
-      <a href="#haki" class="toc-item"><span class="toc-icon">⚖️</span> Haki za Mtumiaji</a>
-      <a href="#tatu" class="toc-item"><span class="toc-icon">🔗</span> Huduma za Tatu</a>
-      <a href="#kufuta" class="toc-item"><span class="toc-icon">🗑️</span> Kufuta Akaunti</a>
-      <a href="#marufuku" class="toc-item"><span class="toc-icon">🚫</span> Yaliyokatazwa</a>
-      <a href="#mipaka" class="toc-item"><span class="toc-icon">📋</span> Mipaka ya Huduma</a>
-      <a href="#wasiliana" class="toc-item"><span class="toc-icon">📞</span> Wasiliana Nasi</a>
+      <a href="#akaunti" class="toc-item"><span class="toc-icon">🔐</span> Account & Registration</a>
+      <a href="#chat" class="toc-item"><span class="toc-icon">💬</span> Chat Service</a>
+      <a href="#faragha" class="toc-item"><span class="toc-icon">🔒</span> Data Privacy</a>
+      <a href="#gmail" class="toc-item"><span class="toc-icon">📧</span> Gmail & Identity</a>
+      <a href="#siri" class="toc-item"><span class="toc-icon">🤫</span> Conversation Privacy</a>
+      <a href="#usalama" class="toc-item"><span class="toc-icon">🛡️</span> Account Security</a>
+      <a href="#watoto" class="toc-item"><span class="toc-icon">👶</span> Child Protection</a>
+      <a href="#haki" class="toc-item"><span class="toc-icon">⚖️</span> User Rights</a>
+      <a href="#tatu" class="toc-item"><span class="toc-icon">🔗</span> Third Parties</a>
+      <a href="#kufuta" class="toc-item"><span class="toc-icon">🗑️</span> Account Deletion</a>
+      <a href="#marufuku" class="toc-item"><span class="toc-icon">🚫</span> Prohibited Conduct</a>
+      <a href="#mipaka" class="toc-item"><span class="toc-icon">📋</span> Service Limitations</a>
+      <a href="#wasiliana" class="toc-item"><span class="toc-icon">📞</span> Contact Us</a>
     </div>
   </div>
 </div>
@@ -586,13 +586,13 @@
 <!-- ── MAIN ── -->
 <main>
 
-  <!-- ══ 1. JINSI YA KUTUMIA ══ -->
+  <!-- ══ 1. HOW TO USE ══ -->
   <section class="section" id="jinsi">
     <div class="section-header">
       <div class="section-num">🗺️</div>
       <div class="section-title-wrap">
-        <h2>Jinsi ya Kutumia VPN K — Hatua kwa Hatua</h2>
-        <p>Mwongozo kamili kuanzia kufungua app hadi kutuma ujumbe</p>
+        <h2>How to Use VPN K — Step by Step</h2>
+        <p>A complete guide from opening the app to sending a message</p>
       </div>
     </div>
 
@@ -601,13 +601,14 @@
       <div class="step-card">
         <div class="step-bubble">1</div>
         <div class="step-body">
-          <div class="step-tag">HATUA YA KWANZA</div>
-          <h3>Fungua VPN K — Ukurasa wa Simulator</h3>
+          <div class="step-tag">STEP ONE</div>
+          <h3>Open VPN K — Simulator Screen</h3>
           <p>
-            Unapofungua app kwa mara ya kwanza, utakutana na ukurasa wa <strong>VPN K Simulator</strong> —
-            ukurasa wenye muundo wa giza (dark) unaofanana na app ya VPN ya kweli.
-            Hapa utaona kitufe kikubwa cha mviringo cha <em>"UNGANISHA"</em> katikati ya skrini,
-            pamoja na habari za seva na hali ya uunganisho.
+            When you open the app for the first time, you'll land on the
+            <strong>VPN K Simulator</strong> screen — a dark-themed page
+            resembling a real VPN app. Here you'll see a large round
+            <em>"CONNECT"</em> button in the center of the screen,
+            along with server information and connection status.
           </p>
         </div>
       </div>
@@ -616,12 +617,12 @@
         <div class="step-bubble">2</div>
         <div class="step-body">
           <div class="step-tag">SIMULATOR</div>
-          <h3>Chunguza Tabs Tatu za VPN K</h3>
+          <h3>Explore the Three VPN K Tabs</h3>
           <p>
-            Simulator ina tabs tatu unazoweza kubonyeza juu ya skrini:<br/><br/>
-            🏠 <strong>Nyumbani</strong> — Unaona hali ya uunganisho, seva uliyochagua, na anwani ya IP.<br/>
-            🌐 <strong>Seva</strong> — Orodha ya nchi 8 (Germany, USA, Japan, Singapore, UK, Netherlands, Canada, Australia). Bonyeza nchi yoyote kuichagua kisha rudi Nyumbani.<br/>
-            ⚙️ <strong>Mipangilio</strong> — Unaona mipangilio kama itifaki ya usalama (WireGuard), DNS, na usimbaji fiche (AES-256).
+            The simulator has three tabs you can tap at the top of the screen:<br/><br/>
+            🏠 <strong>Home</strong> — Shows connection status, the selected server, and your IP address.<br/>
+            🌐 <strong>Servers</strong> — A list of 8 countries (Germany, USA, Japan, Singapore, UK, Netherlands, Canada, Australia). Tap any country to select it, then return to Home.<br/>
+            ⚙️ <strong>Settings</strong> — Shows settings such as security protocol (WireGuard), DNS, and encryption (AES-256).
           </p>
         </div>
       </div>
@@ -630,14 +631,14 @@
         <div class="step-bubble">3</div>
         <div class="step-body">
           <div class="step-tag">SIMULATOR</div>
-          <h3>Jaribu Kuunganisha na Kukata VPN</h3>
+          <h3>Try Connecting and Disconnecting the VPN</h3>
           <p>
-            Bonyeza kitufe kikubwa cha mviringo chenye alama ya 🔒.
-            App itaanza "kuunganisha" kwa sekunde ~2 (itaonyesha ⏳),
-            kisha itabadilika kuwa 🔓 na inaonyesha <strong>hali ya "Umelindwa"</strong>
-            kwa rangi ya buluu (cyan). Utaona pia saa ya muda wa uunganisho,
-            kiasi cha data kilichopakuliwa na kupakiwa, pamoja na anwani ya IP iliyofichwa.
-            Bonyeza tena kitufe kukata uunganisho.
+            Tap the large round button with the 🔒 icon.
+            The app will "connect" for about 2 seconds (showing ⏳),
+            then change to 🔓 displaying a <strong>"Protected"</strong> status
+            in cyan. You'll also see a connection timer,
+            data uploaded/downloaded, and a masked IP address.
+            Tap the button again to disconnect.
           </p>
         </div>
       </div>
@@ -645,14 +646,14 @@
       <div class="step-card">
         <div class="step-bubble">4</div>
         <div class="step-body">
-          <div class="step-tag cyan">HATUA MUHIMU</div>
-          <h3>Bonyeza Alama ya 🔍 (Search) Juu Kulia</h3>
+          <div class="step-tag cyan">KEY STEP</div>
+          <h3>Tap the 🔍 (Search) Icon — Top Right</h3>
           <p>
-            Ukitaka kuingia kwenye sehemu ya chat, bonyeza alama ya <strong>🔍</strong>
-            iliyopo <em>kona ya juu kulia</em> ya skrini ya simulator.
-            Alama hii itakupeleka moja kwa moja kwenye ukurasa wa <strong>kuingia (Login)</strong>.
-            Kuna pia kitufe kidogo chini kabisa cha skrini kinachosema
-            <em>"Ingia kwenye VPN K Chat"</em> ambacho kina kazi sawa.
+            To access the chat section, tap the <strong>🔍</strong> icon
+            located in the <em>top right corner</em> of the simulator screen.
+            This icon takes you directly to the <strong>Login</strong> page.
+            There's also a small button at the very bottom of the screen
+            that says <em>"Sign in to VPN K Chat"</em> which does the same thing.
           </p>
         </div>
       </div>
@@ -660,14 +661,15 @@
       <div class="step-card">
         <div class="step-bubble">5</div>
         <div class="step-body">
-          <div class="step-tag amber">AKAUNTI</div>
-          <h3>Jisajili au Ingia — Ukurasa wa Login</h3>
+          <div class="step-tag amber">ACCOUNT</div>
+          <h3>Sign Up or Log In — Login Page</h3>
           <p>
-            Ukurasa wa login utaonyesha fomu ya <strong>Barua pepe</strong> na <strong>Nenosiri</strong>.
-            Kama ni mara yako ya kwanza, bonyeza <em>"Hauna akaunti? Jisajili"</em> na jaza
-            jina lako, barua pepe na nenosiri (angalau herufi 6).
-            Kama una akaunti tayari, ingia tu kwa barua pepe na nenosiri yako.
-            Kuna pia kitufe cha <em>"← Rudi VPN"</em> ukitaka kurudi simulator.
+            The login page shows an <strong>Email</strong> and
+            <strong>Password</strong> form.
+            If it's your first time, tap <em>"Don't have an account? Sign up"</em>
+            and fill in your name, email, and password (at least 6 characters).
+            If you already have an account, simply log in with your email and password.
+            There's also a <em>"← Back to VPN"</em> button if you want to return to the simulator.
           </p>
         </div>
       </div>
@@ -676,14 +678,14 @@
         <div class="step-bubble">6</div>
         <div class="step-body">
           <div class="step-tag">CHAT</div>
-          <h3>Ukurasa Wako Halisi wa VPN K Chat — Inbox</h3>
+          <h3>Your Real VPN K Chat Page — Inbox</h3>
           <p>
-            Baada ya kuingia, utafika kwenye ukurasa mkuu wa <strong>VPN K Chat</strong>.
-            Utaona orodha ya mazungumzo yako yote (inbox).
-            Kuna vitufe viwili chini: <em>🔄 Refresh</em> (kupakua mazungumzo mapya)
-            na <em>✏️ Anza chat</em> (kuanzisha mazungumzo na mtu mpya).
-            Juu kushoto kuna alama ya ☰ (menyu) na juu kulia kuna jina lako
-            pamoja na kitufe cha kutoka (✕).
+            After logging in, you'll arrive at the main <strong>VPN K Chat</strong> page.
+            You'll see a list of all your conversations (inbox).
+            There are two buttons at the bottom: <em>🔄 Refresh</em> (load new conversations)
+            and <em>✏️ Start chat</em> (start a conversation with someone new).
+            Top left has a ☰ (menu) icon, and top right shows your name
+            along with a logout button (✕).
           </p>
         </div>
       </div>
@@ -692,13 +694,13 @@
         <div class="step-bubble">7</div>
         <div class="step-body">
           <div class="step-tag">CHAT</div>
-          <h3>Anzisha Mazungumzo Mapya</h3>
+          <h3>Start a New Conversation</h3>
           <p>
-            Bonyeza <em>✏️ Anza chat</em> chini ya skrini.
-            Jaza <strong>barua pepe ya mtu</strong> unayetaka kuzungumza naye
-            (lazima awe amejisajili VPN K kwanza), kisha andika ujumbe wako.
-            Bonyeza <em>✉️ Tuma Ujumbe</em>. Utapelekwa moja kwa moja
-            kwenye mazungumzo na mtu huyo.
+            Tap <em>✏️ Start chat</em> at the bottom of the screen.
+            Enter the <strong>person's email address</strong>
+            you want to talk to (they must already be registered on VPN K),
+            then type your message. Tap <em>✉️ Send Message</em>.
+            You'll be taken directly into the conversation with that person.
           </p>
         </div>
       </div>
@@ -707,14 +709,14 @@
         <div class="step-bubble">8</div>
         <div class="step-body">
           <div class="step-tag">CHAT</div>
-          <h3>Tuma na Pokea Ujumbe</h3>
+          <h3>Send and Receive Messages</h3>
           <p>
-            Ndani ya mazungumzo, andika ujumbe wako kwenye kisanduku cha chini.
-            Bonyeza <em>Enter</em> au kitufe cha ➤ kutuma.
-            Ujumbe wako utaonekana upande wa kulia kwa rangi ya kijani (📗),
-            na ujumbe wa mtu mwingine utaonekana upande wa kushoto kwa rangi nyeupe.
-            App inasasisha ujumbe mpya kiotomatiki kila sekunde 6.
-            Bonyeza 🔄 juu kulia ndani ya chat kupata ujumbe wa haraka.
+            Inside a conversation, type your message in the box at the bottom.
+            Tap <em>Enter</em> or the ➤ button to send.
+            Your messages appear on the right in green (📗),
+            and the other person's messages appear on the left in white.
+            The app automatically refreshes new messages every 6 seconds.
+            Tap 🔄 at the top right inside the chat to fetch messages instantly.
           </p>
         </div>
       </div>
@@ -722,14 +724,14 @@
       <div class="step-card">
         <div class="step-bubble">9</div>
         <div class="step-body">
-          <div class="step-tag amber">MENYU</div>
-          <h3>Tumia Menyu ya ☰ (Hamburger Menu)</h3>
+          <div class="step-tag amber">MENU</div>
+          <h3>Use the ☰ Menu (Hamburger Menu)</h3>
           <p>
-            Bonyeza alama ya <strong>☰</strong> juu kushoto kwenye inbox.
-            Sidebar itafunguka kutoka kushoto ikiwa na mafaili muhimu:
-            📜 Masharti ya Matumizi · 🔒 Sera ya Faragha · ❓ Msaada &amp; FAQ ·
-            ℹ️ Kuhusu VPN K · 📞 Wasiliana Nasi · 🛡️ Usalama.
-            Bonyeza popote nje ya menyu kuifunga.
+            Tap the <strong>☰</strong> icon at the top left of the inbox.
+            A sidebar will open from the left containing important pages:
+            📜 Terms of Use · 🔒 Privacy Policy · ❓ Help & FAQ ·
+            ℹ️ About VPN K · 📞 Contact Us · 🛡️ Security.
+            Tap anywhere outside the menu to close it.
           </p>
         </div>
       </div>
@@ -737,14 +739,14 @@
       <div class="step-card">
         <div class="step-bubble">10</div>
         <div class="step-body">
-          <div class="step-tag">KUTOKA</div>
-          <h3>Toka (Logout) na Kurudi Tena</h3>
+          <div class="step-tag">LOGOUT</div>
+          <h3>Log Out and Return Later</h3>
           <p>
-            Bonyeza picha yako (avatar) juu kulia kwenye inbox kutoka.
-            Kikao chako kitafutwa salama.
-            Ukifungua app tena, utakutana na simulator ya VPN — hii ni ya kawaida.
-            Bonyeza 🔍 na uingie tena. Kama ulikuwa umeingia mara ya mwisho,
-            app itakukumbuka na kukupeleka moja kwa moja kwenye chat bila kuingia tena.
+            Tap your profile picture (avatar) at the top right of the inbox to log out.
+            Your session will be safely cleared.
+            If you reopen the app, you'll land back on the VPN simulator — this is normal.
+            Tap 🔍 and log in again. If you were previously logged in,
+            the app will remember you and take you straight to chat without logging in again.
           </p>
         </div>
       </div>
@@ -759,481 +761,481 @@
     <div class="section-header">
       <div class="section-num">🛡️</div>
       <div class="section-title-wrap">
-        <h2>VPN K Simulator — Maelezo Kamili</h2>
-        <p>Kuelewa kila kipengele cha ukurasa wa VPN</p>
+        <h2>VPN K Simulator — Full Details</h2>
+        <p>Understanding every feature of the VPN screen</p>
       </div>
     </div>
 
     <div class="alert info">
       <span class="alert-icon">ℹ️</span>
       <div class="alert-body">
-        <strong>Muhimu: Simulator, Si VPN ya Kweli</strong>
-        <p>VPN K Simulator ni mchezo wa kuigiza (simulation) tu. Haitoi ulinzi wa kweli wa mtandao,
-        haibadilishi IP yako halisi, wala haikusimbii trafiki yako ya intaneti.
-        Imetengezwa kwa madhumuni ya burudani na maonyesho tu.</p>
+        <strong>Important: A Simulator, Not a Real VPN</strong>
+        <p>The VPN K Simulator is purely a simulation. It does not provide real network protection,
+        does not change your actual IP address, and does not encrypt your internet traffic.
+        It was built for entertainment and demonstration purposes only.</p>
       </div>
     </div>
 
     <div class="feature-grid">
       <div class="feature-tile">
         <div class="tile-icon">🔒</div>
-        <div class="tile-label">Kitufe cha Uunganisho</div>
-        <div class="tile-desc">Bonyeza kuunganisha au kukata. Animation ya mzunguko inaonyesha hali ya seva.</div>
+        <div class="tile-label">Connect Button</div>
+        <div class="tile-desc">Tap to connect or disconnect. A spinning animation shows server status.</div>
       </div>
       <div class="feature-tile">
         <div class="tile-icon">🌐</div>
-        <div class="tile-label">Seva 8 za Nchi</div>
-        <div class="tile-desc">Chagua kati ya nchi 8 — Germany, USA, Japan, Singapore, UK, Netherlands, Canada, Australia.</div>
+        <div class="tile-label">8 Country Servers</div>
+        <div class="tile-desc">Choose from 8 countries — Germany, USA, Japan, Singapore, UK, Netherlands, Canada, Australia.</div>
       </div>
       <div class="feature-tile">
         <div class="tile-icon">📊</div>
-        <div class="tile-label">Takwimu za Data</div>
-        <div class="tile-desc">Unaona kiasi cha data iliyopakuliwa, kupakiwa, na muda wa uunganisho kwa wakati halisi.</div>
+        <div class="tile-label">Data Stats</div>
+        <div class="tile-desc">See data downloaded, uploaded, and connection time in real time.</div>
       </div>
       <div class="feature-tile">
         <div class="tile-icon">⚡</div>
-        <div class="tile-label">Ping na Mzigo</div>
-        <div class="tile-desc">Kila seva inaonyesha kasi ya ping (ms) na asilimia ya mzigo wa seva.</div>
+        <div class="tile-label">Ping and Load</div>
+        <div class="tile-desc">Each server shows ping speed (ms) and server load percentage.</div>
       </div>
       <div class="feature-tile">
         <div class="tile-icon">🎨</div>
-        <div class="tile-label">Rangi Inabadilika</div>
-        <div class="tile-desc">Ukurasa unabadilika kutoka rangi ya kawaida hadi rangi ya buluu ukiunganika.</div>
+        <div class="tile-label">Color Changes</div>
+        <div class="tile-desc">The screen shifts from a neutral color to blue/cyan when connected.</div>
       </div>
       <div class="feature-tile">
         <div class="tile-icon">⚙️</div>
-        <div class="tile-label">Mipangilio ya VPN</div>
-        <div class="tile-desc">Inaonyesha WireGuard, AES-256, DNS 1.1.1.1, na mipangilio mingine ya "usalama".</div>
+        <div class="tile-label">VPN Settings</div>
+        <div class="tile-desc">Displays WireGuard, AES-256, DNS 1.1.1.1, and other "security" settings.</div>
       </div>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 3. AKAUNTI ══ -->
+  <!-- ══ 3. ACCOUNT ══ -->
   <section class="section" id="akaunti">
     <div class="section-header">
       <div class="section-num">🔐</div>
       <div class="section-title-wrap">
-        <h2>Akaunti na Usajili</h2>
-        <p>Masharti ya kufungua na kudhibiti akaunti yako</p>
+        <h2>Account & Registration</h2>
+        <p>Terms for opening and managing your account</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>✅ Usajili wa Bure</h3>
-      <p>Kujisajili kwenye VPN K Chat ni bure kabisa. Unahitaji barua pepe halisi na nenosiri la herufi 6 au zaidi. Jina lako litatumika kuonyeshwa kwa watu wanaozungumza nawe.</p>
+      <h3>✅ Free Registration</h3>
+      <p>Signing up for VPN K Chat is completely free. You need a real email address and a password of at least 6 characters. Your name will be displayed to the people you chat with.</p>
     </div>
 
     <div class="info-card">
-      <h3>🔄 Kuingia Kiotomatiki</h3>
-      <p>Baada ya kuingia kwa mara ya kwanza, app itakukumbuka kwa kutumia "refresh token" ya Firebase. Ukifungua app tena, utapelekwa moja kwa moja kwenye chat bila kuhitaji kuingia tena — isipokuwa ukitoka (logout) wewe mwenyewe.</p>
+      <h3>🔄 Automatic Login</h3>
+      <p>After logging in for the first time, the app will remember you using a Firebase "refresh token." If you reopen the app, you'll be taken straight to chat without needing to log in again — unless you log out yourself.</p>
     </div>
 
     <div class="info-card">
-      <h3>⚠️ Wajibu wa Mtumiaji</h3>
+      <h3>⚠️ User Responsibilities</h3>
       <ul>
-        <li>Unahusika mwenyewe na usalama wa nenosiri lako.</li>
-        <li>Usishirikishe akaunti yako na mtu mwingine.</li>
-        <li>Toa taarifa mara moja kama akaunti yako imevamiwa.</li>
-        <li>Kutoa taarifa za uongo wakati wa usajili ni ukiukaji wa masharti haya.</li>
+        <li>You are responsible for keeping your password secure.</li>
+        <li>Do not share your account with anyone else.</li>
+        <li>Report immediately if your account has been compromised.</li>
+        <li>Providing false information during registration is a violation of these terms.</li>
       </ul>
     </div>
 
     <div class="alert warn">
       <span class="alert-icon">⚠️</span>
       <div class="alert-body">
-        <strong>Akaunti Moja kwa Barua Pepe Moja</strong>
-        <p>Kila barua pepe inaweza kuwa na akaunti moja tu. Kujaribu kujisajili tena na barua pepe iliyotumika itasababisha kosa la "Barua pepe hii tayari imesajiliwa."</p>
+        <strong>One Account per Email Address</strong>
+        <p>Each email address can only have one account. Attempting to register again with an already-used email will result in an "This email is already registered" error.</p>
       </div>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 4. HUDUMA YA CHAT ══ -->
+  <!-- ══ 4. CHAT SERVICE ══ -->
   <section class="section" id="chat">
     <div class="section-header">
       <div class="section-num">💬</div>
       <div class="section-title-wrap">
-        <h2>Huduma ya Chat — Masharti</h2>
-        <p>Jinsi unavyoruhusiwa kutumia sehemu ya mazungumzo</p>
+        <h2>Chat Service — Terms</h2>
+        <p>How you are permitted to use the messaging section</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>📨 Kutuma Ujumbe</h3>
+      <h3>📨 Sending Messages</h3>
       <ul>
-        <li>Unaweza kutuma ujumbe kwa mtu yeyote aliyejisajili VPN K kwa kutumia barua pepe yake.</li>
-        <li>Ujumbe huhifadhiwa kwenye hifadhidata ya Firebase Firestore salama.</li>
-        <li>Mazungumzo yanasasishwa kiotomatiki kila sekunde 6.</li>
-        <li>Unaweza kutuma ujumbe wa maandishi tu (maandishi ya kawaida).</li>
+        <li>You can send messages to anyone registered on VPN K using their email address.</li>
+        <li>Messages are stored in a secure Firebase Firestore database.</li>
+        <li>Conversations refresh automatically every 6 seconds.</li>
+        <li>You can only send text messages (plain text).</li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>🔔 Alama za Ujumbe Mpya</h3>
-      <p>Ukipokea ujumbe mpya, nambari nyekundu (badge) itaonekana juu ya picha ya mtu huyo kwenye inbox. Nambari hii itaondoka ukifungua mazungumzo na mtu huyo.</p>
+      <h3>🔔 New Message Indicators</h3>
+      <p>When you receive a new message, a red badge will appear over that person's picture in the inbox. This number disappears once you open the conversation with that person.</p>
     </div>
 
     <div class="alert danger">
       <span class="alert-icon">🚫</span>
       <div class="alert-body">
-        <strong>Ujumbe wa Chuki Umekatazwa</strong>
-        <p>Kutuma ujumbe wa ukatili, vitisho, lugha ya chuki, udanganyifu, au maudhui yanayoumiza watu wengine ni ukiukaji mkubwa wa masharti haya na unaweza kusababisha kufutiwa kwa akaunti yako bila onyo.</p>
+        <strong>Hateful Messages Are Prohibited</strong>
+        <p>Sending abusive, threatening, hateful, deceptive messages, or content that harms others is a serious violation of these terms and may result in your account being deleted without warning.</p>
       </div>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 5. FARAGHA ══ -->
+  <!-- ══ 5. PRIVACY ══ -->
   <section class="section" id="faragha">
     <div class="section-header">
       <div class="section-num">🔒</div>
       <div class="section-title-wrap">
-        <h2>Faragha ya Data Yako</h2>
-        <p>Tunalinda data yako vipi</p>
+        <h2>Your Data Privacy</h2>
+        <p>How we protect your data</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>🗄️ Data Tunayohifadhi</h3>
+      <h3>🗄️ Data We Store</h3>
       <ul>
-        <li>Jina lako la maonyesho (display name)</li>
-        <li>Barua pepe yako (imetumika kama kitambulisho)</li>
-        <li>Ujumbe unaotumwa na kupokea (huhifadhiwa kwenye Firestore)</li>
-        <li>Muda wa kutuma kila ujumbe</li>
+        <li>Your display name</li>
+        <li>Your email address (used as an identifier)</li>
+        <li>Messages sent and received (stored in Firestore)</li>
+        <li>The time each message was sent</li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>🚫 Data Tusiyohifadhi</h3>
+      <h3>🚫 Data We Do Not Store</h3>
       <ul>
-        <li>Nenosiri lako halihifadhiwi kwetu — linasimamiwa na Firebase Authentication</li>
-        <li>Habari za malipo au benki (huduma hii ni ya bure)</li>
-        <li>Picha, faili, au vyombo vya media</li>
-        <li>Eneo lako la kijiografia</li>
+        <li>Your password is not stored by us — it is managed by Firebase Authentication</li>
+        <li>Payment or banking information (this service is free)</li>
+        <li>Photos, files, or media content</li>
+        <li>Your geographic location</li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>🔐 Usalama wa Data</h3>
-      <p>Data yako inahifadhiwa kwenye Google Firebase Firestore ambayo ina usimbaji fiche wa hali ya juu. Mawasiliano kati ya app na seva hutumia HTTPS peke yake.</p>
+      <h3>🔐 Data Security</h3>
+      <p>Your data is stored on Google Firebase Firestore, which uses high-grade encryption. Communication between the app and the server uses HTTPS exclusively.</p>
     </div>
 
     <div class="alert info">
       <span class="alert-icon">🍪</span>
       <div class="alert-body">
-        <strong>Uhifadhi wa Kikao (Session Storage)</strong>
-        <p>App inahifadhi kikao chako (token ya kuingia) kwenye localStorage ya kivinjari chako ili usihitaji kuingia tena. Unaweza kufuta data hii kwa kutoka (logout) au kufuta data ya kivinjari.</p>
+        <strong>Session Storage</strong>
+        <p>The app stores your session (login token) in your browser's localStorage so you don't need to log in again. You can clear this data by logging out or clearing your browser data.</p>
       </div>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 6. GMAIL NA UTAMBULISHO ══ -->
+  <!-- ══ 6. GMAIL & IDENTITY ══ -->
   <section class="section" id="gmail">
     <div class="section-header">
       <div class="section-num">📧</div>
       <div class="section-title-wrap">
-        <h2>Gmail na Barua Pepe kama Utambulisho</h2>
-        <p>Jinsi tunavyotumia barua pepe yako kwa usalama</p>
+        <h2>Gmail and Email as Identity</h2>
+        <p>How we use your email address for security</p>
       </div>
     </div>
 
     <div class="alert info">
       <span class="alert-icon">📧</span>
       <div class="alert-body">
-        <strong>VPN K inatumia Barua Pepe (Gmail) kama Kitambulisho cha Siri</strong>
-        <p>App hii haitumii nambari ya simu wala jina la mtumiaji tu — badala yake, barua pepe yako (hasa Gmail) ndiyo "anwani" yako ya siri ya kufikiwa na watu wanaotaka kuzungumza nawe. Hii ina maana ya kipekee ya kiusalama ambayo unahitaji kuelewa.</p>
+        <strong>VPN K Uses Email (Gmail) as a Private Identifier</strong>
+        <p>This app does not use a phone number or just a username — instead, your email address (especially Gmail) is your private "address" that allows people to reach you for a conversation. This has a unique security implication you need to understand.</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>📧 Jinsi Barua Pepe Inavyotumika</h3>
+      <h3>📧 How Your Email Is Used</h3>
       <ul>
-        <li>Barua pepe yako ni <strong>anwani yako ya umma</strong> ndani ya VPN K — mtu yeyote aliyejisajili anaweza kukutumia ujumbe akijua barua pepe yako.</li>
-        <li>Barua pepe inahifadhiwa kwenye Firestore ya Firebase na inaweza kuonekana na watu wanaotuma ujumbe kwako.</li>
-        <li>Jina la kiolesura (display name) linakuja kutoka kwa sehemu ya barua pepe kabla ya "@" kama hukuweka jina mwenyewe.</li>
-        <li>Mabadiliko ya barua pepe yako ya Gmail hayaathiri akaunti yako ya VPN K — akaunti mbili hizi ni tofauti.</li>
+        <li>Your email is your <strong>public address</strong> within VPN K — anyone who is registered can send you a message if they know your email.</li>
+        <li>Your email is stored in Firebase Firestore and may be visible to people sending you messages.</li>
+        <li>Your display name is derived from the part of your email before the "@" if you didn't set a custom name.</li>
+        <li>Changes to your Gmail account do not affect your VPN K account — these two accounts are separate.</li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>🔍 Utafutaji wa Mtumiaji</h3>
-      <p>Mtu anapotaka kukutumia ujumbe, anachoweza kufanya ni kuweka barua pepe yako moja kwa moja kwenye kisanduku cha "Barua pepe ya mtu". App kisha inatafuta Firestore kuona kama barua pepe hiyo imesajiliwa. Kama ipo — mazungumzo yanaanza. Kama haipo — inaonyesha ujumbe wa hitilafu.</p>
+      <h3>🔍 Finding a User</h3>
+      <p>When someone wants to send you a message, all they need to do is enter your email directly into the "Person's email" box. The app then searches Firestore to see if that email is registered. If it exists — the conversation begins. If not — an error message is shown.</p>
     </div>
 
     <div class="info-card">
-      <h3>🚫 Barua Pepe ya Gmail — Masharti Maalum</h3>
+      <h3>🚫 Gmail Address — Special Terms</h3>
       <ul>
-        <li>Inashauriwa sana kutumia <strong>Gmail</strong> (@gmail.com) kwa sababu inatoa uthabiti wa juu zaidi wa Firebase Authentication.</li>
-        <li>Barua pepe za kampuni au za taasisi zinaweza kufanya kazi, lakini Firebase inaweza kuzikataa kwa sababu za kiusalama.</li>
-        <li>Barua pepe za muda (disposable emails) ni <strong>marufuku</strong> na zinaweza kusababisha kufutiwa kwa akaunti.</li>
-        <li>Usitumie barua pepe ya mtu mwingine — hii ni ukiukaji wa masharti na unaweza kusababisha hatua za kisheria.</li>
+        <li>It is strongly recommended to use <strong>Gmail</strong> (@gmail.com) because it offers the highest reliability with Firebase Authentication.</li>
+        <li>Company or institutional email addresses may work, but Firebase may reject them for security reasons.</li>
+        <li>Disposable/temporary email addresses are <strong>prohibited</strong> and may result in account deletion.</li>
+        <li>Do not use someone else's email address — this is a violation of these terms and may lead to legal action.</li>
       </ul>
     </div>
 
     <div class="alert warn">
       <span class="alert-icon">⚠️</span>
       <div class="alert-body">
-        <strong>Usalama wa Gmail Yako ni Muhimu Sana</strong>
-        <p>Kama mtu ataingilia akaunti yako ya Gmail, anaweza kujaribu kuingia VPN K pia kama anajua nenosiri. Hakikisha Gmail yako ina uthibitishaji wa hatua mbili (2-Step Verification) uwashwe daima kwa usalama wa ziada.</p>
+        <strong>The Security of Your Gmail Account Matters a Lot</strong>
+        <p>If someone gains access to your Gmail account, they may also try to log into VPN K if they know the password. Make sure your Gmail has Two-Step Verification enabled at all times for extra security.</p>
       </div>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 7. USIRI WA MAZUNGUMZO ══ -->
+  <!-- ══ 7. CONVERSATION PRIVACY ══ -->
   <section class="section" id="siri">
     <div class="section-header">
       <div class="section-num">🤫</div>
       <div class="section-title-wrap">
-        <h2>Usiri wa Mazungumzo</h2>
-        <p>Nani anaweza kuona mazungumzo yako na nani hawezi</p>
+        <h2>Conversation Privacy</h2>
+        <p>Who can see your conversations and who cannot</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>👁️ Nani Anaona Ujumbe Wako</h3>
+      <h3>👁️ Who Sees Your Messages</h3>
       <ul>
-        <li><strong>Wewe na mtu unayezungumza naye peke yenu</strong> ndio wanaoweza kuona maudhui ya mazungumzo.</li>
-        <li>Timu ya VPN K inaweza kufikia data ya Firestore kwa madhumuni ya ufundi na usuluhishi wa matatizo tu.</li>
-        <li>Mamlaka za kisheria zinaweza kuomba data yako kwa idhini ya mahakama — tutafuata sheria za Tanzania.</li>
-        <li>Hakuna mtu mwingine — si marafiki wako, si familia — anayeweza kuona mazungumzo yako bila idhini yako.</li>
+        <li><strong>Only you and the person you are chatting with</strong> can see the content of the conversation.</li>
+        <li>The VPN K team may access Firestore data for technical and troubleshooting purposes only.</li>
+        <li>Legal authorities may request your data with court approval — we will comply with Tanzanian law.</li>
+        <li>No one else — not your friends, not your family — can see your conversations without your consent.</li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>🔐 Usimbaji Fiche wa Mazungumzo</h3>
-      <p>Ujumbe wote unapita kwa <strong>HTTPS</strong> (TLS encryption) kati ya kifaa chako na seva za Firebase. Hii inamaanisha mtu yeyote anayejaribu "kunasa" mazungumzo yako mtandaoni hataweza kuyasoma. Hata hivyo, ujumbe unahifadhiwa kwa maandishi ya kawaida (plaintext) kwenye Firestore — si kwa usimbaji fiche wa mwisho hadi mwisho (end-to-end encryption).</p>
+      <h3>🔐 Conversation Encryption</h3>
+      <p>All messages travel over <strong>HTTPS</strong> (TLS encryption) between your device and Firebase's servers. This means anyone attempting to "intercept" your conversations online will not be able to read them. However, messages are stored as plain text in Firestore — not with end-to-end encryption.</p>
     </div>
 
     <div class="alert warn">
       <span class="alert-icon">⚠️</span>
       <div class="alert-body">
-        <strong>Hakuna End-to-End Encryption (E2EE)</strong>
-        <p>VPN K Chat kwa sasa <strong>haitumii</strong> usimbaji fiche wa mwisho hadi mwisho kama WhatsApp au Signal. Ujumbe wako unaweza kuonekana na timu ya ufundi kama kuna sababu ya kisheria au kiufundi. Usitume taarifa nyeti sana (nywila, nambari za benki, n.k.) kupitia app hii.</p>
+        <strong>No End-to-End Encryption (E2EE)</strong>
+        <p>VPN K Chat currently <strong>does not use</strong> end-to-end encryption like WhatsApp or Signal. Your messages may be viewable by the technical team if there is a legal or technical reason. Do not send highly sensitive information (passwords, bank numbers, etc.) through this app.</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>🤫 Usiri wa "Siri" wa VPN K</h3>
+      <h3>🤫 The "Secret" Nature of VPN K</h3>
       <p>
-        Siri ya VPN K iko katika muundo wake — app inaonekana kama simulator ya VPN kutoka nje, lakini ndani yake ni app kamili ya kuchati. Hii inakupa <strong>safu ya ziada ya faragha ya kijamii</strong>: mtu anayeona skrini yako atafikiri unatumia VPN, si kuchati. Hata hivyo, hii si usalama wa kiufundi — ni <em>usalama wa muonekano (security through obscurity)</em> tu. Tegemea tahadhari zako za kawaida pia.
+        The secret of VPN K lies in its design — the app looks like a VPN simulator from the outside, but inside it is a full chat application. This gives you an <strong>extra layer of social privacy</strong>: anyone glancing at your screen will think you're using a VPN, not chatting. However, this is not technical security — it is merely <em>security through obscurity</em>. Continue to rely on your usual precautions as well.
       </p>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 8. USALAMA WA AKAUNTI ══ -->
+  <!-- ══ 8. ACCOUNT SECURITY ══ -->
   <section class="section" id="usalama">
     <div class="section-header">
       <div class="section-num">🛡️</div>
       <div class="section-title-wrap">
-        <h2>Usalama wa Akaunti Yako</h2>
-        <p>Jinsi ya kulinda akaunti yako vizuri</p>
+        <h2>Your Account Security</h2>
+        <p>How to properly protect your account</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>🔑 Nenosiri Imara</h3>
+      <h3>🔑 Strong Passwords</h3>
       <ul>
-        <li>Tumia nenosiri lenye <strong>angalau herufi 8</strong> (app inakubali 6 lakini 8+ ni bora zaidi).</li>
-        <li>Changanya herufi kubwa, ndogo, nambari, na alama (mfano: <code style="color:var(--cyan);background:rgba(0,229,255,0.08);padding:1px 6px;border-radius:4px">VpnK@2025!</code>).</li>
-        <li>Usitumie nenosiri moja kwa huduma nyingi — hii ni hatari ya juu.</li>
-        <li>Usiandike nenosiri lako popote ambapo mtu mwingine anaweza kuliona.</li>
+        <li>Use a password with <strong>at least 8 characters</strong> (the app accepts 6, but 8+ is much better).</li>
+        <li>Mix uppercase, lowercase, numbers, and symbols (e.g., <code style="color:var(--cyan);background:rgba(0,150,170,0.08);padding:1px 6px;border-radius:4px">VpnK@2025!</code>).</li>
+        <li>Don't reuse the same password across multiple services — this is a high risk.</li>
+        <li>Never write your password anywhere someone else could see it.</li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>🚨 Dalili za Akaunti Kuvamiwa</h3>
+      <h3>🚨 Signs Your Account May Be Compromised</h3>
       <ul>
-        <li>Unaona mazungumzo ambayo hukuyaanzisha wewe mwenyewe.</li>
-        <li>Ujumbe unaonekana "umesomwa" au kutumwa bila wewe kufanya hivyo.</li>
-        <li>App inakuambia "Kikao kimeisha muda" mara kwa mara bila sababu.</li>
-        <li>Mtu anakuambia amepokea ujumbe kutoka kwako ambao hukutuma.</li>
+        <li>You see conversations you did not start yourself.</li>
+        <li>Messages appear "read" or sent without you doing so.</li>
+        <li>The app repeatedly tells you "Session expired" for no reason.</li>
+        <li>Someone tells you they received a message from you that you never sent.</li>
       </ul>
     </div>
 
     <div class="alert danger">
       <span class="alert-icon">🚨</span>
       <div class="alert-body">
-        <strong>Hatua za Haraka Ukidhani Akaunti Yako Imevamiwa</strong>
-        <p>1. Toka (logout) mara moja kutoka kwa vifaa vyote. 2. Badilisha nenosiri la Gmail yako linalohusika. 3. Wasiliana nasi mara moja kwa <strong style="color:var(--cyan)">support@vpnk.app</strong> ili tufunge akaunti hiyo haraka. 4. Kagua mazungumzo yako — toa taarifa kwa wahusika kama ujumbe wa hatari ulitumwa kwa jina lako.</p>
+        <strong>Immediate Steps If You Suspect Your Account Was Compromised</strong>
+        <p>1. Log out immediately from all devices. 2. Change the password of the related Gmail account. 3. Contact us right away at <strong style="color:var(--cyan)">support@vpnk.app</strong> so we can lock that account quickly. 4. Review your conversations — notify affected parties if a harmful message was sent under your name.</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>📱 Vifaa Vingi (Multi-device)</h3>
-      <p>Unaweza kuingia VPN K kutoka kwa vifaa tofauti (simu, kompyuta, tablet) kwa kutumia akaunti moja. Kila kifaa kitakuwa na kikao chake. Kutoka kwenye kifaa kimoja hakuathiri vifaa vingine — utakuwa bado umeingia kwenye vifaa vingine. Kama unataka kutoka kwa vifaa vyote, badilisha nenosiri lako kisha ingia tena.</p>
+      <h3>📱 Multiple Devices (Multi-device)</h3>
+      <p>You can log into VPN K from different devices (phone, computer, tablet) using one account. Each device will have its own session. Logging out of one device does not affect the others — you'll remain logged in on the others. If you want to log out of all devices, change your password and log in again.</p>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 9. ULINZI WA WATOTO ══ -->
+  <!-- ══ 9. CHILD PROTECTION ══ -->
   <section class="section" id="watoto">
     <div class="section-header">
       <div class="section-num">👶</div>
       <div class="section-title-wrap">
-        <h2>Ulinzi wa Watoto na Kizuizi cha Umri</h2>
-        <p>Masharti ya umri na wajibu wa wazazi</p>
+        <h2>Child Protection and Age Restrictions</h2>
+        <p>Age requirements and parental responsibilities</p>
       </div>
     </div>
 
     <div class="alert danger">
       <span class="alert-icon">🚫</span>
       <div class="alert-body">
-        <strong>Umri wa Chini: Miaka 13+</strong>
-        <p>VPN K Chat ni kwa watumiaji wenye umri wa miaka 13 na kuendelea. Watoto wenye umri chini ya miaka 13 <strong>hawaruhusiwi</strong> kutumia huduma hii. Kujisajili kwa watoto wenye umri chini ya miaka 13 ni ukiukaji wa masharti haya na tunaweza kufuta akaunti hiyo bila onyo.</p>
+        <strong>Minimum Age: 13+</strong>
+        <p>VPN K Chat is intended for users aged 13 and older. Children under the age of 13 are <strong>not permitted</strong> to use this service. Registering a child under 13 is a violation of these terms, and we may delete that account without warning.</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>👨‍👩‍👧 Wajibu wa Wazazi na Walezi</h3>
+      <h3>👨‍👩‍👧 Parental and Guardian Responsibilities</h3>
       <ul>
-        <li>Wazazi na walezi wana jukumu la kufuatilia matumizi ya watoto wao wa umri kati ya miaka 13–17.</li>
-        <li>Kama mtoto wako ana umri chini ya miaka 13 na amejisajili, wasiliana nasi mara moja ili tufute akaunti hiyo.</li>
-        <li>VPN K haitunzi taarifa za umri wakati wa usajili — tunategemea uaminifu wa watumiaji.</li>
-        <li>Kujisajili kwa jina la mtoto au kwa nia ya kumlaghai mtoto ni ukiukaji mkubwa wa sheria za Tanzania.</li>
+        <li>Parents and guardians are responsible for monitoring the use of their children aged 13–17.</li>
+        <li>If your child is under 13 and has registered, contact us immediately so we can delete that account.</li>
+        <li>VPN K does not collect age information during registration — we rely on user honesty.</li>
+        <li>Registering under a child's name, or with intent to deceive a child, is a serious violation of Tanzanian law.</li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>🛡️ Tunalinda Watoto Vipi</h3>
+      <h3>🛡️ How We Protect Children</h3>
       <ul>
-        <li>Ripoti yoyote ya maudhui yanayodhuru watoto itashughulikiwa kwa haraka ya juu na bila msamaha.</li>
-        <li>Akaunti zote zinazoripotiwa kuwa za watoto chini ya miaka 13 zitafutwa mara moja.</li>
-        <li>Tutashirikiana na mamlaka za kisheria za Tanzania kwa visa vyovyote vinavyohusisha usalama wa watoto.</li>
+        <li>Any report of content harming children will be handled with the highest priority and without leniency.</li>
+        <li>Any account reported as belonging to a child under 13 will be deleted immediately.</li>
+        <li>We will cooperate with Tanzanian legal authorities on any case involving child safety.</li>
       </ul>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 10. HAKI ZA MTUMIAJI ══ -->
+  <!-- ══ 10. USER RIGHTS ══ -->
   <section class="section" id="haki">
     <div class="section-header">
       <div class="section-num">⚖️</div>
       <div class="section-title-wrap">
-        <h2>Haki Zako kama Mtumiaji</h2>
-        <p>Unachostahili kupata na kudai kutoka kwa VPN K</p>
+        <h2>Your Rights as a User</h2>
+        <p>What you are entitled to receive and request from VPN K</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>✅ Haki Zako Kuu</h3>
+      <h3>✅ Your Main Rights</h3>
       <ul>
-        <li><strong>Haki ya Kujua</strong> — Una haki ya kujua data gani tunayohifadhi kukuhusu. Omba kwa kuwasiliana nasi.</li>
-        <li><strong>Haki ya Kusahihisha</strong> — Kama taarifa zako ni za uongo, una haki ya kuzisahihisha — badilisha jina lako la maonyesho kupitia mipangilio.</li>
-        <li><strong>Haki ya Kufuta</strong> — Una haki ya kudai kufutwa kwa data yako yote. Angalia sehemu ya "Kufuta Akaunti" hapa chini.</li>
-        <li><strong>Haki ya Kupinga</strong> — Una haki ya kupinga usindikaji wa data yako kwa madhumuni ya kibiashara.</li>
-        <li><strong>Haki ya Kubeba</strong> — Una haki ya kupokea nakala ya data yako kwa muundo unaoweza kusomwa.</li>
-        <li><strong>Haki ya Kutoka</strong> — Una haki ya kutoka (logout) na kusimamisha matumizi yako wakati wowote bila adhabu.</li>
+        <li><strong>Right to Know</strong> — You have the right to know what data we store about you. Request this by contacting us.</li>
+        <li><strong>Right to Correct</strong> — If your information is inaccurate, you have the right to correct it — change your display name through settings.</li>
+        <li><strong>Right to Delete</strong> — You have the right to request deletion of all your data. See the "Account Deletion" section below.</li>
+        <li><strong>Right to Object</strong> — You have the right to object to the processing of your data for commercial purposes.</li>
+        <li><strong>Right to Data Portability</strong> — You have the right to receive a copy of your data in a readable format.</li>
+        <li><strong>Right to Exit</strong> — You have the right to log out and stop using the service at any time without penalty.</li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>📋 Jinsi ya Kudai Haki Zako</h3>
-      <p>Tuma ombi lako kwa barua pepe: <strong style="color:var(--cyan)">support@vpnk.app</strong><br/>
-      Tutashughulikia ombi lako ndani ya <strong>siku 7 za kazi</strong>. Toa uthibitisho wa utambulisho wako (barua pepe iliyosajiliwa) ili tuhakikishe tunaongea na mtumiaji halisi.</p>
+      <h3>📋 How to Exercise Your Rights</h3>
+      <p>Send your request by email: <strong style="color:var(--cyan)">support@vpnk.app</strong><br/>
+      We will handle your request within <strong>7 business days</strong>. Provide proof of your identity (registered email) so we can confirm we're communicating with the actual user.</p>
     </div>
 
     <div class="info-card">
-      <h3>🆓 Huduma ya Bure — Haki ya Kubadilika</h3>
-      <p>VPN K inatolewa <strong>bila malipo</strong> kwa sasa. Tunajihifadhia haki ya kuanzisha vipengele vya malipo katika siku zijazo. Mabadiliko yoyote ya bei yatatolewa taarifa mapema kwa angalau siku 30 kabla ya kutekelezwa, na mtumiaji atakuwa na hiari ya kuendelea au kufuta akaunti yake bila malipo.</p>
+      <h3>🆓 Free Service — Right to Change</h3>
+      <p>VPN K is currently provided <strong>free of charge</strong>. We reserve the right to introduce paid features in the future. Any pricing changes will be announced at least 30 days in advance, and users will have the option to continue or delete their account free of charge.</p>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 11. HUDUMA ZA TATU ══ -->
+  <!-- ══ 11. THIRD PARTIES ══ -->
   <section class="section" id="tatu">
     <div class="section-header">
       <div class="section-num">🔗</div>
       <div class="section-title-wrap">
-        <h2>Huduma za Wahusika wa Tatu (Third Parties)</h2>
-        <p>Firebase, Google na huduma nyingine tunazotegemea</p>
+        <h2>Third-Party Services</h2>
+        <p>Firebase, Google, and other services we rely on</p>
       </div>
     </div>
 
     <div class="info-card">
       <h3>🔥 Google Firebase</h3>
-      <p>VPN K inatumia <strong>Google Firebase</strong> (inayomilikiwa na Google LLC) kwa huduma zifuatazo:</p>
+      <p>VPN K uses <strong>Google Firebase</strong> (owned by Google LLC) for the following services:</p>
       <ul>
-        <li><strong>Firebase Authentication</strong> — kudhibiti akaunti na nenosiri zako</li>
-        <li><strong>Cloud Firestore</strong> — kuhifadhi mazungumzo, ujumbe, na taarifa za mtumiaji</li>
+        <li><strong>Firebase Authentication</strong> — manages your account and password</li>
+        <li><strong>Cloud Firestore</strong> — stores conversations, messages, and user information</li>
       </ul>
-      <p style="margin-top:10px">Kwa kutumia VPN K, unakubali pia <strong>Masharti ya Matumizi ya Google Firebase</strong> yanayopatikana kwa: <a href="https://firebase.google.com/terms" target="_blank" style="color:var(--cyan)">firebase.google.com/terms</a></p>
+      <p style="margin-top:10px">By using VPN K, you also agree to the <strong>Google Firebase Terms of Service</strong>, available at: <a href="https://firebase.google.com/terms" target="_blank" style="color:var(--cyan)">firebase.google.com/terms</a></p>
     </div>
 
     <div class="info-card">
-      <h3>🌐 Google LLC — Sera ya Faragha</h3>
-      <p>Kwa sababu tunatumia Firebase (bidhaa ya Google), Google pia inaweza kushughulikia sehemu ya data yako kwa mujibu wa Sera yao ya Faragha. Tunashauriwa uisome pia: <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--cyan)">policies.google.com/privacy</a></p>
+      <h3>🌐 Google LLC — Privacy Policy</h3>
+      <p>Because we use Firebase (a Google product), Google may also process part of your data under their own Privacy Policy. We recommend you also read it: <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--cyan)">policies.google.com/privacy</a></p>
     </div>
 
     <div class="info-card">
       <h3>📡 Firestore Security Rules</h3>
-      <p>Mazungumzo yako kwenye Firestore yanalindwa na <strong>Security Rules</strong> ambazo zinahakikisha mtumiaji anaweza kuona mazungumzo yake tu — si ya watu wengine. Hii inatekelezwa upande wa seva (server-side) na haiwezi kubadilishwa na mtu yeyote bila idhini ya kiufundi ya VPN K.</p>
+      <p>Your conversations on Firestore are protected by <strong>Security Rules</strong> that ensure a user can only see their own conversations — not those of others. This is enforced server-side and cannot be altered by anyone without VPN K's technical authorization.</p>
     </div>
 
     <div class="alert warn">
       <span class="alert-icon">⚠️</span>
       <div class="alert-body">
-        <strong>Hatuwajibiki kwa Matatizo ya Firebase / Google</strong>
-        <p>Kama Firebase au Google watashindwa kutoa huduma kwa sababu yoyote (matengenezo, hitilafu za kiufundi, mabadiliko ya sera), VPN K haitawajibika kwa kupotea kwa ujumbe wako au kukosekana kwa huduma. Tunajitahidi kuhakikisha uendelezaji lakini hatudhibiti miundombinu ya Google.</p>
+        <strong>We Are Not Responsible for Firebase / Google Issues</strong>
+        <p>If Firebase or Google fail to provide service for any reason (maintenance, technical errors, policy changes), VPN K will not be responsible for lost messages or service unavailability. We strive to ensure continuity, but we do not control Google's infrastructure.</p>
       </div>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 12. KUFUTA AKAUNTI ══ -->
+  <!-- ══ 12. ACCOUNT DELETION ══ -->
   <section class="section" id="kufuta">
     <div class="section-header">
       <div class="section-num">🗑️</div>
       <div class="section-title-wrap">
-        <h2>Kufuta Akaunti na Data Yako</h2>
-        <p>Hatua za kudai kufutwa kwa akaunti na data yako yote</p>
+        <h2>Deleting Your Account and Data</h2>
+        <p>Steps to request deletion of your account and all your data</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>🗑️ Kufuta Akaunti Yako</h3>
-      <p>Kwa sasa, kufuta akaunti kunafanywa kwa kuwasiliana nasi moja kwa moja kwa barua pepe: <strong style="color:var(--cyan)">support@vpnk.app</strong>. Jaza ombi lako na:</p>
+      <h3>🗑️ Deleting Your Account</h3>
+      <p>Currently, account deletion is handled by contacting us directly via email: <strong style="color:var(--cyan)">support@vpnk.app</strong>. Include the following in your request:</p>
       <ul>
-        <li>Barua pepe ya akaunti unayotaka kufuta</li>
-        <li>Sababu ya kufuta (si lazima lakini inasaidia)</li>
-        <li>Uthibitisho wa utambulisho wako</li>
+        <li>The email address of the account you want deleted</li>
+        <li>Your reason for deleting (not required, but helpful)</li>
+        <li>Proof of your identity</li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>📂 Data Inayofutwa</h3>
+      <h3>📂 Data That Gets Deleted</h3>
       <ul>
-        <li>✅ Taarifa zako za mtumiaji (jina, barua pepe kwenye Firestore)</li>
-        <li>✅ Ujumbe wote uliohusika nawe kwenye mazungumzo yako</li>
-        <li>✅ Akaunti ya Firebase Authentication</li>
-        <li>⚠️ Nakala za akiba (backups) zinaweza kuchukua hadi siku 30 kufutwa kabisa</li>
-        <li>⚠️ Ujumbe uliotumwa kwa watu wengine unaweza bado kuonekana upande wao — hii ni kikwazo cha kiufundi</li>
+        <li>✅ Your user information (name, email in Firestore)</li>
+        <li>✅ All messages associated with your conversations</li>
+        <li>✅ Your Firebase Authentication account</li>
+        <li>⚠️ Backup copies may take up to 30 days to be fully erased</li>
+        <li>⚠️ Messages sent to other people may still appear on their end — this is a technical limitation</li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>⏱️ Muda wa Kushughulikia</h3>
-      <p>Tutashughulikia ombi lako la kufuta akaunti ndani ya <strong>siku 14 za kazi</strong>. Utapokea uthibitisho wa kufuta kwa barua pepe yako iliyosajiliwa. Baada ya kufuta, hutaweza kupata tena ujumbe uliopita au kurejesha akaunti hiyo.</p>
+      <h3>⏱️ Processing Time</h3>
+      <p>We will process your account deletion request within <strong>14 business days</strong>. You will receive confirmation of deletion via your registered email. After deletion, you will not be able to recover past messages or restore that account.</p>
     </div>
 
     <div class="alert info">
       <span class="alert-icon">ℹ️</span>
       <div class="alert-body">
-        <strong>Kutoka (Logout) ≠ Kufuta Akaunti</strong>
-        <p>Kutoka kwenye app ni tofauti kabisa na kufuta akaunti. Unapotoka, akaunti yako na data zako zinaendelea kuhifadhiwa — unaweza kuingia tena wakati wowote. Kufuta akaunti ni hatua ya kudumu isiyoweza kugeuzwa.</p>
+        <strong>Logout ≠ Account Deletion</strong>
+        <p>Logging out of the app is completely different from deleting your account. When you log out, your account and data remain stored — you can log back in at any time. Deleting your account is a permanent, irreversible action.</p>
       </div>
     </div>
   </section>
@@ -1245,94 +1247,94 @@
     <div class="section-header">
       <div class="section-num">🚫</div>
       <div class="section-title-wrap">
-        <h2>Matumizi Yaliyokatazwa</h2>
-        <p>Mambo usiyoruhusiwa kufanya kwenye VPN K</p>
+        <h2>Prohibited Conduct</h2>
+        <p>Things you are not allowed to do on VPN K</p>
       </div>
     </div>
 
     <div class="alert danger">
       <span class="alert-icon">❌</span>
       <div class="alert-body">
-        <strong>Ukiukaji wa Masharti — Orodha Kamili</strong>
-        <p>Yafuatayo yanakatazwa kabisa na yanaweza kusababisha kufutiwa kwa akaunti, au hatua za kisheria:</p>
+        <strong>Violation of Terms — Full List</strong>
+        <p>The following are strictly prohibited and may result in account deletion or legal action:</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>🚫 Yaliyokatazwa</h3>
+      <h3>🚫 Prohibited Actions</h3>
       <ul>
-        <li>Kutumia app kwa madhumuni ya udanganyifu au ulaghai</li>
-        <li>Kutuma ujumbe wa vitisho, unyanyasaji, au usumbufu</li>
-        <li>Kujaribu kuingilia akaunti za watu wengine</li>
-        <li>Kusambaza maudhui ya ngono au ya watu wazima</li>
-        <li>Kutumia app kwa makusudi ya uharibifu wa mfumo</li>
-        <li>Kuunda akaunti nyingi kwa lengo la kudanganya au kuharibu</li>
-        <li>Kutumia app kwa njia inayovunja sheria za Tanzania au nchi yoyote</li>
-        <li>Kusambaza habari za uongo zinazoweza kudhuru watu au jamii</li>
+        <li>Using the app for fraud or deception</li>
+        <li>Sending threatening, abusive, or harassing messages</li>
+        <li>Attempting to access other people's accounts</li>
+        <li>Distributing sexual or adult content</li>
+        <li>Using the app to intentionally damage the system</li>
+        <li>Creating multiple accounts for the purpose of deception or abuse</li>
+        <li>Using the app in a way that violates the laws of Tanzania or any other country</li>
+        <li>Spreading false information that could harm people or society</li>
       </ul>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 7. MIPAKA ══ -->
+  <!-- ══ 7. LIMITATIONS ══ -->
   <section class="section" id="mipaka">
     <div class="section-header">
       <div class="section-num">⚖️</div>
       <div class="section-title-wrap">
-        <h2>Mipaka ya Huduma</h2>
-        <p>Tunaeleza nini kinachoweza kubadilika au kukosekana</p>
+        <h2>Service Limitations</h2>
+        <p>What may change or become unavailable</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>⏰ Upatikanaji wa Huduma</h3>
-      <p>Tunajitahidi kuhakikisha app inapatikana saa 24. Hata hivyo, tunahifadhi haki ya kusimamisha huduma kwa matengenezo ya mfumo, maboresho, au sababu zingine za kiufundi bila onyo la mapema.</p>
+      <h3>⏰ Service Availability</h3>
+      <p>We strive to keep the app available 24/7. However, we reserve the right to suspend service for system maintenance, upgrades, or other technical reasons without prior notice.</p>
     </div>
 
     <div class="info-card">
-      <h3>📝 Mabadiliko ya Masharti</h3>
-      <p>Masharti haya yanaweza kubadilika wakati wowote. Mabadiliko yataonekana kwenye ukurasa huu na tarehe ya sasisho itabadilika. Kuendelea kutumia app baada ya mabadiliko kunamaanisha umekubali masharti mapya.</p>
+      <h3>📝 Changes to These Terms</h3>
+      <p>These terms may change at any time. Changes will appear on this page and the update date will be revised. Continuing to use the app after changes are made means you have accepted the new terms.</p>
     </div>
 
     <div class="info-card">
-      <h3>🛡️ Mipaka ya Dhima</h3>
-      <p>VPN K haitawajibika kwa hasara yoyote inayotokana na matumizi ya app, ikiwa ni pamoja na hasara ya data, upotezaji wa ujumbe, au matatizo ya kiufundi nje ya uwezo wetu.</p>
+      <h3>🛡️ Limitation of Liability</h3>
+      <p>VPN K will not be liable for any loss arising from use of the app, including data loss, lost messages, or technical issues beyond our control.</p>
     </div>
 
     <div class="alert warn">
       <span class="alert-icon">⚠️</span>
       <div class="alert-body">
-        <strong>Simulator Si VPN ya Kweli — Onyo la Kisheria</strong>
-        <p>VPN K Simulator ni zana ya burudani na maonyesho tu. Haitoi ulinzi wa kweli wa data yako kwenye mtandao. Usitegemee simulator hii kwa usalama wa kweli wa mtandao.</p>
+        <strong>The Simulator Is Not a Real VPN — Legal Notice</strong>
+        <p>VPN K Simulator is purely an entertainment and demonstration tool. It does not provide real protection of your data on the network. Do not rely on this simulator for actual network security.</p>
       </div>
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ══ 8. WASILIANA ══ -->
+  <!-- ══ 8. CONTACT ══ -->
   <section class="section" id="wasiliana">
     <div class="section-header">
       <div class="section-num">📞</div>
       <div class="section-title-wrap">
-        <h2>Wasiliana Nasi</h2>
-        <p>Tuko hapa kukusaidia</p>
+        <h2>Contact Us</h2>
+        <p>We're here to help</p>
       </div>
     </div>
 
     <div class="info-card">
-      <h3>💌 Njia za Kuwasiliana</h3>
+      <h3>💌 Ways to Reach Us</h3>
       <ul>
-        <li>Barua pepe: <strong style="color:var(--cyan)">support@vpnk.app</strong></li>
-        <li>Kupitia app yenyewe — fungua chat na uwasiliane na msaada</li>
-        <li>Ukurasa wa Msaada: <strong style="color:var(--cyan)">Help &amp; FAQ.html</strong></li>
+        <li>Email: <strong style="color:var(--cyan)">support@vpnk.app</strong></li>
+        <li>Through the app itself — open chat and reach out to support</li>
+        <li>Help Page: <strong style="color:var(--cyan)">Help & FAQ.html</strong></li>
       </ul>
     </div>
 
     <div class="info-card">
-      <h3>🇹🇿 Sheria Inayotumika</h3>
-      <p>Masharti haya yanafuata sheria za Jamhuri ya Muungano wa Tanzania. Migogoro yoyote itashughulikiwa kwa mujibu wa sheria za Tanzania.</p>
+      <h3>🇹🇿 Governing Law</h3>
+      <p>These terms are governed by the laws of the United Republic of Tanzania. Any disputes will be handled in accordance with Tanzanian law.</p>
     </div>
 
   </section>
@@ -1343,13 +1345,13 @@
 <footer>
   <div class="footer-logo">VPN <span>K</span></div>
   <div class="footer-links">
-    <a href="Terms.html">Masharti ya Matumizi</a>
-    <a href="Privacy Policy.html">Sera ya Faragha</a>
-    <a href="Help & FAQ.html">Msaada</a>
-    <a href="Contact Us.html">Wasiliana</a>
-    <a href="About.html">Kuhusu</a>
+    <a href="Terms.html">Terms of Use</a>
+    <a href="PrivacyPolicy.html">Privacy Policy</a>
+    <a href="Help & FAQ.html">Help</a>
+    <a href="Contact Us.html">Contact</a>
+    <a href="About.html">About</a>
   </div>
-  <p>© 2025 VPN K · Haki zote zimehifadhiwa · Imetengezwa Tanzania 🇹🇿</p>
+  <p>© 2025 VPN K · All rights reserved · Made in Tanzania 🇹🇿</p>
 </footer>
 
 <script>
