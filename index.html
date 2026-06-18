@@ -137,6 +137,131 @@ async function clearSession() {
   try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
 }
 
+// ─── Settings storage (kila sehemu ya Settings inahifadhiwa hapa, kwa mtumiaji
+// huyu pekee, na inarejea kila wakati app inafunguliwa) ───────────────────────
+const SETTINGS_KEY = "vpnk_settings_v1";
+
+const DEFAULT_SETTINGS = {
+  // 1. Notifications
+  notifNewMessage: true,
+  notifSound: true,
+  notifVibration: true,
+  notifLed: true,
+  // 2. Appearance
+  darkMode: false,
+  fontSize: "medium",        // small | medium | large | xlarge
+  chatTheme: "teal",         // teal | blue | purple | rose | amber
+  fontStyle: "inter",        // inter | serif | mono | rounded
+  // 3. Messages
+  deliveryReports: true,
+  autoDeleteDays: "never",   // never | 30 | 90 | 365
+  showCharCounter: true,
+  signature: "",
+  // 4. Privacy & Security
+  appLockEnabled: false,
+  appLockPin: "",
+  hiddenChatIds: [],
+  blockedEmails: [],
+  spamFilter: true,
+  // 5. Backup handled as actions, not persisted toggles
+  // 6. Communication
+  quickReplies: ["Sawa 👍", "Nitarudi baadaye", "Asante!", "Sina taarifa hivi sasa"],
+  autoReplyEnabled: false,
+  autoReplyText: "Samahani, sipo karibu na simu kwa sasa. Nitarudi haraka iwezekanavyo.",
+  favoriteEmails: [],
+  // 8. Accessibility
+  largeTapTargets: false,
+  highContrast: false,
+  ttsEnabled: false,
+  // 10. AI
+  aiSuggestions: true,
+  aiGrammarFix: true,
+  aiSmartReply: true,
+  aiSummarizer: true,
+};
+
+async function saveSettings(settings) {
+  const json = JSON.stringify(settings);
+  try {
+    if (window.storage) { await window.storage.set(SETTINGS_KEY, json, false); return; }
+  } catch (e) {}
+  try { localStorage.setItem(SETTINGS_KEY, json); } catch (e) {}
+}
+
+async function loadSettings() {
+  let saved = null;
+  try {
+    if (window.storage) {
+      const r = await window.storage.get(SETTINGS_KEY, false);
+      saved = r && r.value ? JSON.parse(r.value) : null;
+    }
+  } catch (e) {}
+  if (!saved) {
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      saved = raw ? JSON.parse(raw) : null;
+    } catch (e) { saved = null; }
+  }
+  return { ...DEFAULT_SETTINGS, ...(saved || {}) };
+}
+
+// Tumia herufi za nafasi (storage) za window.storage moja kwa moja kwa
+// idadi ya nafasi inayotumika (storage usage estimate) - tunakokotoa kwa
+// kupima ukubwa wa JSON ya session + settings + cache ya chats kwenye
+// localStorage (kadirio pekee, si hesabu kamili ya server).
+function estimateStorageUsageKB() {
+  let total = 0;
+  try {
+    for (const k in localStorage) {
+      if (!Object.prototype.hasOwnProperty.call(localStorage, k)) continue;
+      total += (localStorage[k] || "").length + k.length;
+    }
+  } catch (e) {}
+  return (total / 1024).toFixed(1);
+}
+
+// ─── VPN K AI (Groq / Llama) ──────────────────────────────────────────────
+// ⚠️ ONYO LA USALAMA: Funguo hii ya API iko wazi hapa kwa sababu app hii ni
+// faili moja ya mbele (frontend-only), bila server yake. Hii inamaanisha
+// MTU YEYOTE anayetembelea ukurasa huu anaweza kuiona kwa "View Source" au
+// DevTools, na kuitumia kwa gharama yako. Kabla ya kuweka app hii live kwa
+// umma, ni VYEMA: (1) ufute (revoke) funguo hii ukiona imeshawekwa wazi
+// mahali popote (chat, GitHub public, n.k.) na uunde mpya, na (2) kama
+// inawezekana, hamishia ombi hili kwenye seva ndogo (proxy) badala ya
+// kupiga Groq moja kwa moja kutoka kwa kivinjari.
+const GROQ_API_KEY = "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";
+const GROQ_MODEL = "llama-3.3-70b-versatile";
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+async function askVpnkAI(messages, { temperature = 0.6, maxTokens = 700, system } = {}) {
+  const fullMessages = system
+    ? [{ role: "system", content: system }, ...messages]
+    : messages;
+  const res = await fetch(GROQ_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${GROQ_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages: fullMessages,
+      temperature,
+      max_tokens: maxTokens,
+    }),
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || "VPN K AI imeshindwa kujibu.");
+  return data?.choices?.[0]?.message?.content?.trim() || "";
+}
+
+const VPNK_AI_SYSTEM_PROMPT =
+  "Wewe ni 'VPN K AI', msaidizi wa akili bandia ndani ya app ya VPN K Chat. " +
+  "Jibu kwa Kiswahili fasaha, kwa ufupi na kwa heshima, isipokuwa mtumiaji " +
+  "akiandika kwa Kiingereza - hapo jibu kwa Kiingereza. Kazi yako ni kumsaidia " +
+  "mtumiaji kuandika majibu bora ya ujumbe, kusahihisha sarufi, kupendekeza " +
+  "majibu ya haraka (smart reply), na kufupisha mazungumzo marefu. Kuwa " +
+  "mchangamfu, wa moja kwa moja, na usitoe maelezo marefu yasiyo ya lazima.";
 // ─── Firestore REST helpers ─────────────────────────────────────────────────
 // Tunatumia Firestore "structured" document format moja kwa moja kupitia REST,
 // kwa kuwa hatutumii firebase SDK.
@@ -357,6 +482,27 @@ async function firestoreGetConversationsFor(idToken, email) {
 }
 
 // ─── UI Components ───────────────────────────────────────────────────────────
+// S ni "live theme object" - tunaibadilisha (mutate) papo hapo kulingana na
+// Settings (Dark Mode na Chat Theme), badala ya kuandika tena kila sehemu ya
+// app inayotumia S.xxx. Components zinazotumia S zitapata rangi mpya wakati
+// applyTheme() inapoitwa, mradi tu ziitwe upya (re-render) baada ya hapo.
+const CHAT_THEMES = {
+  teal:   { green: "#26A69A", greenDark: "#00897B" },
+  blue:   { green: "#2D7DD2", greenDark: "#1B5FA8" },
+  purple: { green: "#7E57C2", greenDark: "#5E35B1" },
+  rose:   { green: "#E0598B", greenDark: "#C2185B" },
+  amber:  { green: "#E0A030", greenDark: "#B9790E" },
+};
+
+const FONT_FAMILIES = {
+  inter:   "Inter, 'Segoe UI', -apple-system, Roboto, sans-serif",
+  serif:   "'Georgia', 'Times New Roman', serif",
+  mono:    "'Courier New', ui-monospace, monospace",
+  rounded: "'Comic Sans MS', 'Trebuchet MS', sans-serif",
+};
+
+const FONT_SIZES = { small: 13, medium: 15, large: 17, xlarge: 19 };
+
 const S = {
   bg: "#F0EBE1",
   white: "#FFFFFF",
@@ -367,7 +513,54 @@ const S = {
   border: "rgba(0,0,0,0.08)",
   input: "#F5F5F5",
   red: "#E53935",
+  bubbleOut: "#DCF8C6",
+  bubbleIn: "#FFFFFF",
+  chatBg: "#ECE5DD",
+  fontFamily: FONT_FAMILIES.inter,
+  baseFontSize: FONT_SIZES.medium,
 };
+
+function applyTheme(settings) {
+  const theme = CHAT_THEMES[settings.chatTheme] || CHAT_THEMES.teal;
+  if (settings.darkMode) {
+    S.bg = "#121A1E";
+    S.white = "#1C262B";
+    S.text = settings.highContrast ? "#FFFFFF" : "#EDEDED";
+    S.sub = settings.highContrast ? "#DDDDDD" : "#9AA5A8";
+    S.border = "rgba(255,255,255,0.10)";
+    S.input = "#15201F";
+    S.bubbleOut = theme.greenDark;
+    S.bubbleIn = "#22302F";
+    S.chatBg = "#0E1517";
+  } else {
+    S.bg = "#F0EBE1";
+    S.white = "#FFFFFF";
+    S.text = settings.highContrast ? "#000000" : "#1A1A1A";
+    S.sub = settings.highContrast ? "#222222" : "#666666";
+    S.border = "rgba(0,0,0,0.08)";
+    S.input = "#F5F5F5";
+    S.bubbleOut = "#DCF8C6";
+    S.bubbleIn = "#FFFFFF";
+    S.chatBg = "#ECE5DD";
+  }
+  S.green = theme.green;
+  S.greenDark = theme.greenDark;
+  S.red = "#E53935";
+  S.fontFamily = FONT_FAMILIES[settings.fontStyle] || FONT_FAMILIES.inter;
+  S.baseFontSize = (FONT_SIZES[settings.fontSize] || FONT_SIZES.medium) + (settings.largeTapTargets ? 1 : 0);
+}
+
+// Soma maandishi kwa sauti (Text-to-Speech) - kipengele cha Accessibility.
+function speakText(text) {
+  try {
+    if (!("speechSynthesis" in window) || !text) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "sw-TZ";
+    u.rate = 0.98;
+    window.speechSynthesis.speak(u);
+  } catch (e) {}
+}
 
 // ─── VPN K Simulator ─────────────────────────────────────────────────────────
 const VPN_SERVERS = [
@@ -730,10 +923,12 @@ const MENU_LINKS = [
   { icon: "📜", label: "Terms & Use", file: "Terms.html" },
   { icon: "🔒", label: "Sera ya Faragha", file: "Privacy Policy.html" },
   { icon: "❓", label: "Msaada & FAQ", file: "Help & FAQ.html" },
-  
+  { icon: "ℹ️", label: "Kuhusu VPN K", file: "About.html" },
+  { icon: "📞", label: "Wasiliana Nasi", file: "Contact Us.html" },
+  { icon: "🛡️", label: "Usalama", file: "Security.html" },
 ];
 
-function HamburgerDrawer({ open, onClose, userName, userEmail }) {
+function HamburgerDrawer({ open, onClose, userName, userEmail, onOpenSettings, onOpenAI }) {
   if (!open) return null;
   return (
     <>
@@ -755,7 +950,7 @@ function HamburgerDrawer({ open, onClose, userName, userEmail }) {
 
         {/* Header ya drawer */}
         <div style={{
-          background: "linear-gradient(135deg,#26A69A,#00695C)",
+          background: `linear-gradient(135deg,${S.green},${S.greenDark})`,
           padding: "30px 20px 20px",
           display: "flex", flexDirection: "column", gap: 4
         }}>
@@ -775,6 +970,40 @@ function HamburgerDrawer({ open, onClose, userName, userEmail }) {
 
         {/* Mafaili ya menu */}
         <div style={{ flex: 1, overflowY: "auto" }}>
+          <button
+            onClick={() => { onClose(); onOpenSettings(); }}
+            style={{
+              display: "flex", alignItems: "center", gap: 14,
+              padding: "15px 20px", width: "100%",
+              background: "transparent", border: "none", cursor: "pointer",
+              textAlign: "left", color: S.text,
+              borderBottom: `1px solid ${S.border}`,
+              fontSize: 15, fontWeight: 600,
+              fontFamily: "inherit",
+            }}
+          >
+            <span style={{ fontSize: 20, width: 28, textAlign: "center" }}>⚙️</span>
+            <span>Mipangilio (Settings)</span>
+            <span style={{ marginLeft: "auto", color: S.sub, fontSize: 18 }}>›</span>
+          </button>
+
+          <button
+            onClick={() => { onClose(); onOpenAI(); }}
+            style={{
+              display: "flex", alignItems: "center", gap: 14,
+              padding: "15px 20px", width: "100%",
+              background: "transparent", border: "none", cursor: "pointer",
+              textAlign: "left", color: S.text,
+              borderBottom: `1px solid ${S.border}`,
+              fontSize: 15, fontWeight: 600,
+              fontFamily: "inherit",
+            }}
+          >
+            <span style={{ fontSize: 20, width: 28, textAlign: "center" }}>🤖</span>
+            <span>VPN K AI</span>
+            <span style={{ marginLeft: "auto", color: S.sub, fontSize: 18 }}>›</span>
+          </button>
+
           {MENU_LINKS.map((item, i) => (
             <a key={i} href={item.file}
               style={{
@@ -839,22 +1068,40 @@ function Avatar({ name, photo, size = 46, unread = 0 }) {
   );
 }
 
-function ContactRow({ contact, onClick }) {
+function ContactRow({ contact, onClick, onLongAction, isFavorite }) {
+  let pressTimer = null;
+  let longFired = false;
+  function startPress() {
+    longFired = false;
+    pressTimer = setTimeout(() => { longFired = true; onLongAction && onLongAction(contact); }, 550);
+  }
+  function endPress() { clearTimeout(pressTimer); }
+  function handleClick() { if (!longFired) onClick && onClick(); }
   return (
-    <div onClick={onClick} style={{
-      display: "flex", alignItems: "center", gap: 14,
-      padding: "13px 16px", cursor: "pointer",
-      borderBottom: `1px solid ${S.border}`,
-      background: S.white,
-      transition: "background 0.12s",
-    }}
+    <div
+      onClick={handleClick}
+      onMouseDown={startPress}
+      onMouseUp={endPress}
+      onMouseLeave={endPress}
+      onTouchStart={startPress}
+      onTouchEnd={endPress}
+      style={{
+        display: "flex", alignItems: "center", gap: 14,
+        padding: "13px 16px", cursor: "pointer",
+        borderBottom: `1px solid ${S.border}`,
+        background: S.white,
+        transition: "background 0.12s",
+      }}
       onMouseEnter={e => e.currentTarget.style.background = "#F7F3EC"}
-      onMouseLeave={e => e.currentTarget.style.background = S.white}
+      onMouseLeaveCapture={e => e.currentTarget.style.background = S.white}
     >
       <Avatar name={contact.name} size={48} unread={contact.unread || 0} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-          <span style={{ fontWeight: 700, fontSize: 15, color: S.text }}>{contact.name}</span>
+          <span style={{ fontWeight: 700, fontSize: 15, color: S.text, display: "flex", alignItems: "center", gap: 5 }}>
+            {isFavorite && <span style={{ fontSize: 12 }}>⭐</span>}
+            {contact.name}
+          </span>
           <span style={{ fontSize: 12, color: S.sub }}>{contact.lastTime}</span>
         </div>
         <div style={{
@@ -866,24 +1113,27 @@ function ContactRow({ contact, onClick }) {
   );
 }
 
-function Bubble({ msg }) {
+function Bubble({ msg, ttsEnabled }) {
   const out = msg.direction === "out";
   return (
     <div style={{
       display: "flex", justifyContent: out ? "flex-end" : "flex-start",
       padding: "2px 12px", marginBottom: 2
     }}>
-      <div style={{
-        maxWidth: "76%",
-        background: out ? "#DCF8C6" : S.white,
-        borderRadius: out ? "16px 4px 16px 16px" : "4px 16px 16px 16px",
-        padding: "9px 12px 6px",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
-      }}>
+      <div
+        onClick={() => { if (ttsEnabled) speakText(msg.text); }}
+        style={{
+          maxWidth: "76%",
+          background: out ? S.bubbleOut : S.bubbleIn,
+          borderRadius: out ? "16px 4px 16px 16px" : "4px 16px 16px 16px",
+          padding: "9px 12px 6px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          cursor: ttsEnabled ? "pointer" : "default"
+        }}>
         {!out && msg.from && (
           <div style={{ fontSize: 12, color: S.green, fontWeight: 700, marginBottom: 2 }}>{msg.from}</div>
         )}
-        <div style={{ fontSize: 14, color: S.text, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{msg.text}</div>
+        <div style={{ fontSize: S.baseFontSize - 1, color: S.text, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{msg.text}</div>
         <div style={{ fontSize: 11, color: "#999", textAlign: "right", marginTop: 4, display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 3 }}>
           {msg.time}
           {out && <span style={{ color: S.green }}>✓✓</span>}
@@ -1072,6 +1322,505 @@ function LoginScreen({ onSubmit, busy, error, mode, setMode }) {
 }
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
+// ─── Settings UI building blocks ─────────────────────────────────────────────
+function Toggle({ checked, onChange }) {
+  return (
+    <div
+      onClick={() => onChange(!checked)}
+      role="switch" aria-checked={checked}
+      style={{
+        width: 46, height: 26, borderRadius: 14, flexShrink: 0,
+        background: checked ? S.green : "#CCCCCC",
+        position: "relative", cursor: "pointer", transition: "background 0.2s"
+      }}>
+      <div style={{
+        position: "absolute", top: 3, left: checked ? 23 : 3,
+        width: 20, height: 20, borderRadius: "50%", background: "#fff",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.3)", transition: "left 0.2s"
+      }} />
+    </div>
+  );
+}
+
+function SettingsSection({ icon, title, subtitle, children }) {
+  return (
+    <div style={{ marginBottom: 22 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, padding: "0 4px" }}>
+        <span style={{ fontSize: 18 }}>{icon}</span>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: S.text }}>{title}</div>
+          {subtitle && <div style={{ fontSize: 11, color: S.sub }}>{subtitle}</div>}
+        </div>
+      </div>
+      <div style={{
+        background: S.white, borderRadius: 14, border: `1px solid ${S.border}`,
+        overflow: "hidden"
+      }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function SettingsRow({ label, desc, right, last, onClick }) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        display: "flex", alignItems: "center", gap: 12,
+        padding: "13px 16px", borderBottom: last ? "none" : `1px solid ${S.border}`,
+        cursor: onClick ? "pointer" : "default"
+      }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 600, color: S.text }}>{label}</div>
+        {desc && <div style={{ fontSize: 11.5, color: S.sub, marginTop: 2 }}>{desc}</div>}
+      </div>
+      {right}
+    </div>
+  );
+}
+
+function SettingsSelect({ value, onChange, options }) {
+  return (
+    <select value={value} onChange={e => onChange(e.target.value)} style={{
+      background: S.input, border: `1px solid ${S.border}`, borderRadius: 10,
+      padding: "7px 10px", fontSize: 13, color: S.text, fontFamily: "inherit",
+      outline: "none", cursor: "pointer"
+    }}>
+      {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+    </select>
+  );
+}
+
+function SettingsHeader({ title, onBack }) {
+  return (
+    <div style={{
+      background: S.white, padding: "14px 16px",
+      display: "flex", alignItems: "center", gap: 12,
+      borderBottom: `1px solid ${S.border}`,
+      boxShadow: "0 2px 6px rgba(0,0,0,0.06)", flexShrink: 0
+    }}>
+      <button onClick={onBack} style={{
+        background: "none", border: "none", cursor: "pointer", fontSize: 20, color: S.green
+      }}>←</button>
+      <span style={{ fontSize: 18, fontWeight: 700, color: S.text }}>{title}</span>
+    </div>
+  );
+}
+
+// ─── Settings Screen Kamili ───────────────────────────────────────────────
+function SettingsScreen({ settings, updateSettings, onBack, showToast, user }) {
+  const [pinModal, setPinModal] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [blockInput, setBlockInput] = useState("");
+  const [favInput, setFavInput] = useState("");
+  const [newQuickReply, setNewQuickReply] = useState("");
+
+  function setPin() {
+    if (pinInput.trim().length < 4) { showToast("PIN lazima iwe na angalau tarakimu 4"); return; }
+    updateSettings({ appLockEnabled: true, appLockPin: pinInput.trim() });
+    setPinModal(false); setPinInput("");
+    showToast("Ufunguo wa PIN umewekwa ✓");
+  }
+
+  function disableLock() {
+    updateSettings({ appLockEnabled: false, appLockPin: "" });
+    showToast("App Lock imezimwa");
+  }
+
+  function addBlocked() {
+    const e = blockInput.trim().toLowerCase();
+    if (!e || !e.includes("@")) { showToast("Weka barua pepe sahihi"); return; }
+    if (settings.blockedEmails.includes(e)) { showToast("Tayari imezuiwa"); return; }
+    updateSettings({ blockedEmails: [...settings.blockedEmails, e] });
+    setBlockInput("");
+  }
+
+  function removeBlocked(e) {
+    updateSettings({ blockedEmails: settings.blockedEmails.filter(x => x !== e) });
+  }
+
+  function addFavorite() {
+    const e = favInput.trim().toLowerCase();
+    if (!e || !e.includes("@")) { showToast("Weka barua pepe sahihi"); return; }
+    if (settings.favoriteEmails.includes(e)) { showToast("Tayari kwenye vipendwa"); return; }
+    updateSettings({ favoriteEmails: [...settings.favoriteEmails, e] });
+    setFavInput("");
+  }
+
+  function removeFavorite(e) {
+    updateSettings({ favoriteEmails: settings.favoriteEmails.filter(x => x !== e) });
+  }
+
+  function addQuickReply() {
+    const t = newQuickReply.trim();
+    if (!t) return;
+    updateSettings({ quickReplies: [...settings.quickReplies, t] });
+    setNewQuickReply("");
+  }
+
+  function removeQuickReply(i) {
+    updateSettings({ quickReplies: settings.quickReplies.filter((_, idx) => idx !== i) });
+  }
+
+  async function doExportSMS() {
+    try {
+      const data = {
+        exportedAt: new Date().toISOString(),
+        user: user?.email || null,
+        settings,
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `vpnk-backup-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("Faili la backup limepakuliwa ✓");
+    } catch (e) {
+      showToast("Imeshindwa kuhamisha data ✗");
+    }
+  }
+
+  function doClearCache() {
+    try {
+      const keep = {};
+      [SESSION_KEY, SETTINGS_KEY].forEach(k => { if (localStorage.getItem(k) != null) keep[k] = localStorage.getItem(k); });
+      localStorage.clear();
+      Object.keys(keep).forEach(k => localStorage.setItem(k, keep[k]));
+      showToast("Cache imefutwa ✓");
+    } catch (e) {
+      showToast("Imeshindwa kufuta cache");
+    }
+  }
+
+  function doDeleteAllMessages() {
+    if (!window.confirm("Una hakika? Hatua hii itaficha mazungumzo YOTE kwenye orodha yako ya inbox (hapa kwenye kifaa hiki). Haiwezi kurudishwa kirahisi.")) return;
+    showToast("Tumia 'Futa SMS zote' kwa tahadhari - kipengele hiki bado ni cha onyo pekee kwa sasa.");
+  }
+
+  const usageKB = estimateStorageUsageKB();
+
+  return (
+    <>
+      <SettingsHeader title="⚙️ Mipangilio" onBack={onBack} />
+      <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "16px 14px 40px", background: S.bg }}>
+
+        {/* 1. ARIFA */}
+        <SettingsSection icon="🔔" title="Arifa (Notifications)" subtitle="Dhibiti jinsi unavyopokea arifa za ujumbe">
+          <SettingsRow label="Arifa za ujumbe mpya" desc="Pokea arifa kila ujumbe mpya unapofika"
+            right={<Toggle checked={settings.notifNewMessage} onChange={v => updateSettings({ notifNewMessage: v })} />} />
+          <SettingsRow label="Sauti ya ujumbe" desc="Cheza sauti wakati ujumbe unapofika"
+            right={<Toggle checked={settings.notifSound} onChange={v => updateSettings({ notifSound: v })} />} />
+          <SettingsRow label="Mtetemo (Vibration)" desc="Tetemesha kifaa wakati wa arifa"
+            right={<Toggle checked={settings.notifVibration} onChange={v => updateSettings({ notifVibration: v })} />} />
+          <SettingsRow label="Taa ya arifa (LED)" desc="Washa taa ya arifa kwenye vifaa vinavyosaidia" last
+            right={<Toggle checked={settings.notifLed} onChange={v => updateSettings({ notifLed: v })} />} />
+        </SettingsSection>
+
+        {/* 2. MUONEKANO */}
+        <SettingsSection icon="🎨" title="Muonekano (Appearance)" subtitle="Badilisha jinsi VPN K inavyoonekana">
+          <SettingsRow label="Dark Mode" desc="Tumia muonekano wa giza kwenye app nzima"
+            right={<Toggle checked={settings.darkMode} onChange={v => updateSettings({ darkMode: v })} />} />
+          <SettingsRow label="Ukubwa wa maandishi" desc="Chagua ukubwa wa herufi kwenye mazungumzo"
+            right={<SettingsSelect value={settings.fontSize} onChange={v => updateSettings({ fontSize: v })}
+              options={[{ value: "small", label: "Ndogo" }, { value: "medium", label: "Wastani" }, { value: "large", label: "Kubwa" }, { value: "xlarge", label: "Kubwa Zaidi" }]} />} />
+          <SettingsRow label="Rangi za mazungumzo" desc="Chagua mandhari ya rangi ya chat"
+            right={<SettingsSelect value={settings.chatTheme} onChange={v => updateSettings({ chatTheme: v })}
+              options={[{ value: "teal", label: "Teal (Default)" }, { value: "blue", label: "Bluu" }, { value: "purple", label: "Zambarau" }, { value: "rose", label: "Pinki" }, { value: "amber", label: "Dhahabu" }]} />} />
+          <SettingsRow label="Font style" desc="Chagua mtindo wa fonti" last
+            right={<SettingsSelect value={settings.fontStyle} onChange={v => updateSettings({ fontStyle: v })}
+              options={[{ value: "inter", label: "Inter (Default)" }, { value: "serif", label: "Serif" }, { value: "mono", label: "Monospace" }, { value: "rounded", label: "Rounded" }]} />} />
+        </SettingsSection>
+
+        {/* 3. UJUMBE */}
+        <SettingsSection icon="💬" title="Mipangilio ya Ujumbe" subtitle="Dhibiti jinsi ujumbe wako unavyotumwa">
+          <SettingsRow label="Delivery Reports" desc="Onyesha alama ✓✓ ujumbe ukipokelewa"
+            right={<Toggle checked={settings.deliveryReports} onChange={v => updateSettings({ deliveryReports: v })} />} />
+          <SettingsRow label="Futa ujumbe wa zamani automatically" desc="Ondoa kiotomatiki ujumbe baada ya muda fulani"
+            right={<SettingsSelect value={settings.autoDeleteDays} onChange={v => updateSettings({ autoDeleteDays: v })}
+              options={[{ value: "never", label: "Kamwe" }, { value: "30", label: "Siku 30" }, { value: "90", label: "Siku 90" }, { value: "365", label: "Mwaka 1" }]} />} />
+          <SettingsRow label="Character counter" desc="Onyesha idadi ya herufi unapoandika"
+            right={<Toggle checked={settings.showCharCounter} onChange={v => updateSettings({ showCharCounter: v })} />} />
+          <div style={{ padding: "13px 16px" }}>
+            <div style={{ fontSize: 13.5, fontWeight: 600, color: S.text, marginBottom: 6 }}>Signature ya ujumbe</div>
+            <input value={settings.signature} onChange={e => updateSettings({ signature: e.target.value })}
+              placeholder="mfano: — Imetumwa kutoka VPN K" style={{
+                width: "100%", background: S.input, border: `1px solid ${S.border}`,
+                borderRadius: 10, padding: "9px 12px", fontSize: 13, color: S.text,
+                outline: "none", fontFamily: "inherit", boxSizing: "border-box"
+              }} />
+            <div style={{ fontSize: 11, color: S.sub, marginTop: 5 }}>Itaongezwa mwishoni mwa kila ujumbe unaotuma.</div>
+          </div>
+        </SettingsSection>
+
+        {/* 4. FARAGHA NA USALAMA */}
+        <SettingsSection icon="🔐" title="Faragha na Usalama" subtitle="Linda app yako na mazungumzo yako binafsi">
+          <SettingsRow
+            label="Kufunga App (PIN)"
+            desc={settings.appLockEnabled ? "Imewashwa - app inahitaji PIN kufunguka" : "Funga app yako kwa PIN ya tarakimu 4+"}
+            right={
+              settings.appLockEnabled
+                ? <button onClick={disableLock} style={{ background: "transparent", border: `1.5px solid ${S.red}`, color: S.red, borderRadius: 16, padding: "6px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Zima</button>
+                : <button onClick={() => setPinModal(true)} style={{ background: S.green, border: "none", color: "#fff", borderRadius: 16, padding: "6px 12px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Weka PIN</button>
+            } />
+
+          {pinModal && (
+            <div style={{ padding: "12px 16px", borderBottom: `1px solid ${S.border}`, background: S.input }}>
+              <input type="password" inputMode="numeric" maxLength={8} value={pinInput} onChange={e => setPinInput(e.target.value)}
+                placeholder="Weka PIN mpya (tarakimu 4+)" style={{
+                  width: "100%", background: S.white, border: `1px solid ${S.border}`,
+                  borderRadius: 10, padding: "9px 12px", fontSize: 14, color: S.text,
+                  outline: "none", marginBottom: 8, boxSizing: "border-box", letterSpacing: 4
+                }} />
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={setPin} style={{ flex: 1, background: S.green, color: "#fff", border: "none", borderRadius: 10, padding: "9px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Hifadhi PIN</button>
+                <button onClick={() => { setPinModal(false); setPinInput(""); }} style={{ flex: 1, background: "transparent", color: S.sub, border: `1px solid ${S.border}`, borderRadius: 10, padding: "9px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Ghairi</button>
+              </div>
+            </div>
+          )}
+
+          <SettingsRow label="Spam filter" desc="Onyo kuhusu ujumbe wenye dalili za ulaghai" last={settings.blockedEmails.length === 0 && settings.favoriteEmails.length === 0}
+            right={<Toggle checked={settings.spamFilter} onChange={v => updateSettings({ spamFilter: v })} />} />
+
+          <div style={{ padding: "13px 16px", borderTop: `1px solid ${S.border}` }}>
+            <div style={{ fontSize: 13.5, fontWeight: 600, color: S.text, marginBottom: 8 }}>🚫 Zuia barua pepe (Block)</div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              <input value={blockInput} onChange={e => setBlockInput(e.target.value)} placeholder="mtu@gmail.com"
+                style={{ flex: 1, background: S.input, border: `1px solid ${S.border}`, borderRadius: 10, padding: "8px 11px", fontSize: 13, color: S.text, outline: "none", fontFamily: "inherit" }} />
+              <button onClick={addBlocked} style={{ background: S.red, color: "#fff", border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Zuia</button>
+            </div>
+            {settings.blockedEmails.length === 0 ? (
+              <div style={{ fontSize: 11.5, color: S.sub }}>Hakuna barua pepe iliyozuiwa.</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {settings.blockedEmails.map(e => (
+                  <div key={e} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: S.input, borderRadius: 8, padding: "6px 10px" }}>
+                    <span style={{ fontSize: 12.5, color: S.text }}>{e}</span>
+                    <span onClick={() => removeBlocked(e)} style={{ color: S.green, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Fungua</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </SettingsSection>
+
+        {/* 5. BACKUP NA RESTORE */}
+        <SettingsSection icon="🗄️" title="Backup na Restore" subtitle="Hifadhi nakala ya mipangilio na data yako">
+          <SettingsRow label="Hamisha data (Export)" desc="Pakua faili la JSON la mipangilio na taarifa zako"
+            right={<button onClick={doExportSMS} style={{ background: S.green, color: "#fff", border: "none", borderRadius: 16, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Pakua</button>} />
+          <SettingsRow label="Backup ya mazungumzo" desc="Mazungumzo yako tayari yamehifadhiwa kwa usalama kwenye Firestore - hauitaji backup ya ziada" />
+          <SettingsRow label="Restore" desc="Mazungumzo yanapakiwa moja kwa moja unapoingia kwenye akaunti yako kwa kifaa kingine" last />
+        </SettingsSection>
+
+        {/* 6. MAWASILIANO */}
+        <SettingsSection icon="📇" title="Mipangilio ya Mawasiliano" subtitle="Quick replies, auto-reply, na vipendwa">
+          <div style={{ padding: "13px 16px", borderBottom: `1px solid ${S.border}` }}>
+            <div style={{ fontSize: 13.5, fontWeight: 600, color: S.text, marginBottom: 8 }}>⚡ Quick Replies</div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              <input value={newQuickReply} onChange={e => setNewQuickReply(e.target.value)} placeholder="Andika jibu la haraka..."
+                style={{ flex: 1, background: S.input, border: `1px solid ${S.border}`, borderRadius: 10, padding: "8px 11px", fontSize: 13, color: S.text, outline: "none", fontFamily: "inherit" }} />
+              <button onClick={addQuickReply} style={{ background: S.green, color: "#fff", border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Ongeza</button>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {settings.quickReplies.map((qr, i) => (
+                <span key={i} style={{ display: "flex", alignItems: "center", gap: 6, background: S.input, borderRadius: 14, padding: "5px 10px", fontSize: 12, color: S.text }}>
+                  {qr}
+                  <span onClick={() => removeQuickReply(i)} style={{ color: S.red, cursor: "pointer", fontWeight: 700 }}>✕</span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <SettingsRow label="Auto Reply" desc="Jibu kiotomatiki ujumbe unapokuwa hayupo"
+            right={<Toggle checked={settings.autoReplyEnabled} onChange={v => updateSettings({ autoReplyEnabled: v })} />} />
+          {settings.autoReplyEnabled && (
+            <div style={{ padding: "0 16px 13px" }}>
+              <textarea value={settings.autoReplyText} onChange={e => updateSettings({ autoReplyText: e.target.value })} rows={2}
+                style={{ width: "100%", background: S.input, border: `1px solid ${S.border}`, borderRadius: 10, padding: "9px 12px", fontSize: 13, color: S.text, outline: "none", fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" }} />
+            </div>
+          )}
+
+          <div style={{ padding: "13px 16px", borderTop: `1px solid ${S.border}` }}>
+            <div style={{ fontSize: 13.5, fontWeight: 600, color: S.text, marginBottom: 8 }}>⭐ Vipendwa (Favorite Contacts)</div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              <input value={favInput} onChange={e => setFavInput(e.target.value)} placeholder="mtu@gmail.com"
+                style={{ flex: 1, background: S.input, border: `1px solid ${S.border}`, borderRadius: 10, padding: "8px 11px", fontSize: 13, color: S.text, outline: "none", fontFamily: "inherit" }} />
+              <button onClick={addFavorite} style={{ background: S.green, color: "#fff", border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>+ Ongeza</button>
+            </div>
+            {settings.favoriteEmails.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {settings.favoriteEmails.map(e => (
+                  <div key={e} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: S.input, borderRadius: 8, padding: "6px 10px" }}>
+                    <span style={{ fontSize: 12.5, color: S.text }}>⭐ {e}</span>
+                    <span onClick={() => removeFavorite(e)} style={{ color: S.red, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Ondoa</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <SettingsRow label="Contact Synchronization" desc="Vipendwa na mazungumzo yako vinasawazishwa moja kwa moja kupitia akaunti yako" last />
+        </SettingsSection>
+
+        {/* 7. STORAGE */}
+        <SettingsSection icon="📦" title="Storage" subtitle="Dhibiti nafasi inayotumika kwenye kifaa">
+          <SettingsRow label="Nafasi iliyotumika" desc={`Takriban ${usageKB} KB kwenye kifaa hiki`} />
+          <SettingsRow label="Futa Cache" desc="Ondoa data ya muda bila kuathiri akaunti au mazungumzo yako"
+            right={<button onClick={doClearCache} style={{ background: "transparent", border: `1.5px solid ${S.green}`, color: S.green, borderRadius: 16, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Futa</button>} />
+          <SettingsRow label="Futa SMS Zote" desc="Ondoa mazungumzo YOTE kwenye kifaa hiki (hatua ya tahadhari)" last
+            right={<button onClick={doDeleteAllMessages} style={{ background: "transparent", border: `1.5px solid ${S.red}`, color: S.red, borderRadius: 16, padding: "7px 14px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Futa</button>} />
+        </SettingsSection>
+
+        {/* 8. ACCESSIBILITY */}
+        <SettingsSection icon="♿" title="Accessibility" subtitle="Vipengele vya kufanya app iwe rahisi kutumia kwa kila mtu">
+          <SettingsRow label="Text size kubwa zaidi" desc="Ongeza ukubwa wa maeneo ya kubofya (tap targets)"
+            right={<Toggle checked={settings.largeTapTargets} onChange={v => updateSettings({ largeTapTargets: v })} />} />
+          <SettingsRow label="High Contrast Mode" desc="Ongeza utofauti wa rangi kwa usomaji bora"
+            right={<Toggle checked={settings.highContrast} onChange={v => updateSettings({ highContrast: v })} />} />
+          <SettingsRow label="Voice Reading (Text-to-Speech)" desc="Bonyeza ujumbe wowote ili kuusikiliza" last
+            right={<Toggle checked={settings.ttsEnabled} onChange={v => updateSettings({ ttsEnabled: v })} />} />
+        </SettingsSection>
+
+        {/* 10. AI FEATURES */}
+        <SettingsSection icon="🤖" title="VPN K AI Features" subtitle="Dhibiti uwezo wa akili bandia ndani ya chat">
+          <SettingsRow label="AI message suggestions" desc="Pendekezo za ujumbe wakati unaandika"
+            right={<Toggle checked={settings.aiSuggestions} onChange={v => updateSettings({ aiSuggestions: v })} />} />
+          <SettingsRow label="AI grammar correction" desc="Sahihisha sarufi ya ujumbe wako kiotomatiki"
+            right={<Toggle checked={settings.aiGrammarFix} onChange={v => updateSettings({ aiGrammarFix: v })} />} />
+          <SettingsRow label="Smart Reply" desc="Pendekezo za majibu ya haraka kulingana na mazungumzo"
+            right={<Toggle checked={settings.aiSmartReply} onChange={v => updateSettings({ aiSmartReply: v })} />} />
+          <SettingsRow label="SMS Summarizer" desc="Fupisha mazungumzo marefu kwa muhtasari wa haraka" last
+            right={<Toggle checked={settings.aiSummarizer} onChange={v => updateSettings({ aiSummarizer: v })} />} />
+        </SettingsSection>
+
+        {/* 9. KUHUSU APP */}
+        <SettingsSection icon="ℹ️" title="Kuhusu App (About)" subtitle="Taarifa za jumla na msaada">
+          <SettingsRow label="Version ya app" desc="VPN K v1.0" />
+          <SettingsRow label="Privacy Policy" desc="Soma sera yetu ya faragha" onClick={() => window.location.href = "Privacy Policy.html"}
+            right={<span style={{ color: S.sub, fontSize: 16 }}>›</span>} />
+          <SettingsRow label="Terms of Service" desc="Soma vigezo vya matumizi" onClick={() => window.location.href = "Terms.html"}
+            right={<span style={{ color: S.sub, fontSize: 16 }}>›</span>} />
+          <SettingsRow label="Contact Support" desc="support@vpnk.app" onClick={() => window.location.href = "mailto:support@vpnk.app"}
+            right={<span style={{ color: S.sub, fontSize: 16 }}>›</span>} />
+          <SettingsRow label="Rate App" desc="Tupatie maoni yako kuhusu VPN K" last
+            right={<span style={{ color: "#FFB300", fontSize: 14 }}>★★★★★</span>} />
+        </SettingsSection>
+
+      </div>
+    </>
+  );
+}
+
+// ─── VPN K AI Chat Screen ────────────────────────────────────────────────
+function VpnkAIScreen({ onBack, settings }) {
+  const [messages, setMessages] = useState([
+    { role: "assistant", content: "Habari! Mimi ni VPN K AI 🤖 Naweza kukusaidia kuandika ujumbe, kusahihisha sarufi, kupendekeza majibu ya haraka, au kufupisha mazungumzo marefu. Niandikie unachohitaji." }
+  ]);
+  const [input, setInput] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const endRef = useRef(null);
+
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, busy]);
+
+  async function send(customText) {
+    const text = (customText !== undefined ? customText : input).trim();
+    if (!text || busy) return;
+    setInput("");
+    setError("");
+    const next = [...messages, { role: "user", content: text }];
+    setMessages(next);
+    setBusy(true);
+    try {
+      const apiMessages = next
+        .filter(m => m.role === "user" || m.role === "assistant")
+        .slice(-12)
+        .map(m => ({ role: m.role, content: m.content }));
+      const reply = await askVpnkAI(apiMessages, { system: VPNK_AI_SYSTEM_PROMPT });
+      setMessages(m => [...m, { role: "assistant", content: reply || "Samahani, sikuweza kupata jibu. Jaribu tena." }]);
+    } catch (e) {
+      setError(e.message || "Hitilafu imetokea.");
+      setMessages(m => [...m, { role: "assistant", content: "⚠️ Samahani, VPN K AI imeshindwa kujibu kwa sasa. Tafadhali jaribu tena baadaye." }]);
+    }
+    setBusy(false);
+  }
+
+  const shortcuts = [
+    { label: "✍️ Niandikie ujumbe", prompt: "Niandikie ujumbe mzuri wa kumjulisha rafiki yangu kuwa nitachelewa kidogo." },
+    { label: "🔤 Sahihisha sarufi", prompt: "Sahihisha sarufi ya sentensi hii: " },
+    { label: "💡 Pendekeza jibu", prompt: "Nipendekeze majibu mafupi matatu ya kujibu ujumbe huu: " },
+    { label: "📝 Fupisha mazungumzo", prompt: "Fupisha mazungumzo haya kwa sentensi mbili: " },
+  ];
+
+  return (
+    <>
+      <SettingsHeader title="🤖 VPN K AI" onBack={onBack} />
+      <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "14px 0", background: S.chatBg }}>
+        {messages.map((m, i) => (
+          <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", padding: "3px 14px" }}>
+            <div style={{
+              maxWidth: "82%",
+              background: m.role === "user" ? S.bubbleOut : S.bubbleIn,
+              borderRadius: m.role === "user" ? "16px 4px 16px 16px" : "4px 16px 16px 16px",
+              padding: "10px 13px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              fontSize: S.baseFontSize - 1, color: S.text, lineHeight: 1.6, whiteSpace: "pre-wrap"
+            }}>
+              {m.role === "assistant" && <div style={{ fontSize: 11, fontWeight: 800, color: S.green, marginBottom: 3 }}>🤖 VPN K AI</div>}
+              {m.content}
+            </div>
+          </div>
+        ))}
+        {busy && (
+          <div style={{ display: "flex", justifyContent: "flex-start", padding: "3px 14px" }}>
+            <div style={{ background: S.bubbleIn, borderRadius: "4px 16px 16px 16px", padding: "10px 14px", fontSize: 13, color: S.sub }}>
+              ⏳ VPN K AI inaandika...
+            </div>
+          </div>
+        )}
+        <div ref={endRef} />
+      </div>
+
+      <div style={{ display: "flex", gap: 8, padding: "8px 12px 0", overflowX: "auto", flexShrink: 0, background: S.white }}>
+        {shortcuts.map((s, i) => (
+          <button key={i} onClick={() => setInput(s.prompt)} style={{
+            flexShrink: 0, background: S.input, border: `1px solid ${S.border}`,
+            color: S.text, borderRadius: 16, padding: "6px 13px",
+            fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap"
+          }}>{s.label}</button>
+        ))}
+      </div>
+
+      <div style={{
+        background: S.white, padding: "10px 12px",
+        display: "flex", alignItems: "flex-end", gap: 8,
+        borderTop: `1px solid ${S.border}`, flexShrink: 0
+      }}>
+        <textarea value={input} onChange={e => setInput(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+          placeholder="Andika swali lako kwa VPN K AI..." rows={1}
+          style={{
+            flex: 1, background: S.input, border: "none",
+            borderRadius: 20, padding: "10px 16px", fontSize: S.baseFontSize + 1,
+            color: S.text, resize: "none", outline: "none",
+            fontFamily: "inherit", lineHeight: 1.5, maxHeight: 100, overflowY: "auto"
+          }} />
+        <button onClick={() => send()} disabled={!input.trim() || busy} style={{
+          background: input.trim() ? S.green : "#ccc", border: "none",
+          color: "#fff", width: 42, height: 42, borderRadius: "50%",
+          cursor: input.trim() ? "pointer" : "default", fontSize: 18,
+          flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: input.trim() ? `0 2px 8px ${S.green}66` : "none",
+          transition: "all 0.2s"
+        }}>{busy ? "⏳" : "➤"}</button>
+      </div>
+    </>
+  );
+}
+
 function App() {
   const [user, setUser] = useState(null);          // { uid, name, email, token }
   const [checkingSession, setCheckingSession] = useState(true);
@@ -1080,7 +1829,7 @@ function App() {
   const [authMode, setAuthMode] = useState("login"); // login | signup
 
   const [appScreen, setAppScreen] = useState("vpn"); // vpn | login | chat
-  const [view, setView] = useState("inbox");        // inbox | chat | newChat
+  const [view, setView] = useState("inbox");        // inbox | chat | newChat | settings | ai
   const [contacts, setContacts] = useState([]);
   const [active, setActive] = useState(null);
   const [chats, setChats] = useState({});
@@ -1093,6 +1842,45 @@ function App() {
   const endRef = useRef(null);
   const pollRef = useRef(null);
   const inboxPollRef = useRef(null);
+
+  // ── Settings ──
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [themeTick, setThemeTick] = useState(0); // inalazimisha re-render baada ya applyTheme()
+  const [appLocked, setAppLocked] = useState(false);
+  const [pinAttempt, setPinAttempt] = useState("");
+  const [pinError, setPinError] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      const s = await loadSettings();
+      setSettings(s);
+      applyTheme(s);
+      setAppLocked(!!(s.appLockEnabled && s.appLockPin));
+      setSettingsLoaded(true);
+      setThemeTick(t => t + 1);
+    })();
+  }, []);
+
+  async function updateSettings(patch) {
+    setSettings(prev => {
+      const next = { ...prev, ...patch };
+      applyTheme(next);
+      saveSettings(next);
+      setThemeTick(t => t + 1);
+      return next;
+    });
+  }
+
+  function unlockApp(pin) {
+    if (pin === settings.appLockPin) {
+      setAppLocked(false);
+      setPinError("");
+      setPinAttempt("");
+    } else {
+      setPinError("PIN si sahihi. Jaribu tena.");
+    }
+  }
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chats, active]);
 
@@ -1186,6 +1974,7 @@ function App() {
     setChats({});
     setActive(null);
     setView("inbox");
+    if (settings.appLockEnabled) setAppLocked(true);
   }
 
   // ── Mazungumzo (Firestore) ──
@@ -1296,7 +2085,12 @@ function App() {
 
   async function sendReply() {
     if (!input.trim() || !active) return;
-    const txt = input.trim();
+    if (settings.blockedEmails.includes(active.email)) {
+      showToast("Umemzuia mtumiaji huyu. Fungua tena ufikiwe Mipangilio kumzuia.");
+      return;
+    }
+    const sig = settings.signature ? `\n${settings.signature}` : "";
+    const txt = input.trim() + sig;
     setInput("");
     const tmp = { id: `tmp${Date.now()}`, from: "Wewe", text: txt, time: now(), direction: "out" };
     setChats(c => ({ ...c, [active.id]: [...(c[active.id] || []), tmp] }));
@@ -1304,7 +2098,7 @@ function App() {
     try {
       await sendMessageTo(active.email, active.name, txt);
       setContacts(cs => cs.map(c => c.id === active.id ? { ...c, lastMsg: txt, lastTime: now() } : c));
-      showToast("Imetumwa ✓");
+      showToast(settings.deliveryReports ? "Imetumwa na kupokelewa ✓✓" : "Imetumwa ✓");
     } catch (e) {
       showToast("Imeshindwa ✗ " + e.message);
     }
@@ -1313,21 +2107,28 @@ function App() {
 
   async function sendNew() {
     if (!ncEmail.trim() || !ncMsg.trim()) { showToast("Jaza email na ujumbe"); return; }
+    const cleanTarget = ncEmail.trim().toLowerCase();
+    if (settings.blockedEmails.includes(cleanTarget)) {
+      showToast("Barua pepe hii imezuiwa. Iondoe kwenye Mipangilio → Faragha kwanza.");
+      return;
+    }
     setBusy(true);
     try {
-      const cid = await sendMessageTo(ncEmail.trim(), null, ncMsg.trim());
+      const sig = settings.signature ? `\n${settings.signature}` : "";
+      const finalMsg = ncMsg.trim() + sig;
+      const cid = await sendMessageTo(ncEmail.trim(), null, finalMsg);
       const newC = {
         id: cid,
         name: ncEmail.split("@")[0],
-        email: ncEmail.trim().toLowerCase(),
-        lastMsg: ncMsg.trim(),
+        email: cleanTarget,
+        lastMsg: finalMsg,
         lastTime: now(),
         unread: 0,
       };
       setContacts(cs => [newC, ...cs.filter(c => c.id !== cid)]);
       setChats(c => ({
         ...c,
-        [cid]: [{ id: "tmp0", from: "Wewe", text: ncMsg.trim(), time: now(), direction: "out" }],
+        [cid]: [{ id: "tmp0", from: "Wewe", text: finalMsg, time: now(), direction: "out" }],
       }));
       setNcEmail(""); setNcMsg("");
       setActive(newC); setView("chat");
@@ -1337,6 +2138,7 @@ function App() {
     }
     setBusy(false);
   }
+
 
   // Polling rahisi: pakua ujumbe upya kila sekunde 6 wakati chat iko wazi
   useEffect(() => {
@@ -1356,6 +2158,22 @@ function App() {
 
   const activeChats = active ? (chats[active.id] || []) : [];
 
+  // Orodha ya mazungumzo yanayoonekana - tunaficha yale aliyoyaficha mwenyewe
+  // (hiddenChatIds) na yale yenye barua pepe iliyozuiwa (blockedEmails).
+  const visibleContacts = contacts.filter(c =>
+    !settings.hiddenChatIds.includes(c.id) &&
+    !settings.blockedEmails.includes((c.email || "").toLowerCase())
+  );
+
+  function toggleHideContact(contact) {
+    const isHidden = settings.hiddenChatIds.includes(contact.id);
+    const next = isHidden
+      ? settings.hiddenChatIds.filter(id => id !== contact.id)
+      : [...settings.hiddenChatIds, contact.id];
+    updateSettings({ hiddenChatIds: next });
+    showToast(isHidden ? `Mazungumzo na ${contact.name} yameonyeshwa tena` : `Mazungumzo na ${contact.name} yamefichwa`);
+  }
+
   // ── Shell ──
   // Kama bado tunaangalia kikao, ruhusu kwa sababu checkingSession itatoa jibu hivi karibuni.
   // VPN screen inaonekana kama appScreen === "vpn"
@@ -1367,10 +2185,47 @@ function App() {
     );
   }
 
+  // PIN lock screen - inaonekana juu ya kila kitu kingine kama App Lock imewashwa,
+  // na tu wakati mtumiaji bado ameingia (logged in) - sio baada ya logout.
+  if (appScreen === "chat" && user && settingsLoaded && appLocked) {
+    return (
+      <div style={{
+        height: "100vh", maxWidth: 480, margin: "0 auto",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        background: S.bg, fontFamily: S.fontFamily, padding: 24
+      }}>
+        <div style={{
+          width: 76, height: 76, borderRadius: 22,
+          background: `linear-gradient(135deg,${S.green},${S.greenDark})`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 34, marginBottom: 18, boxShadow: `0 8px 24px ${S.green}55`
+        }}>🔒</div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: S.text, marginBottom: 6 }}>VPN K Imefungwa</div>
+        <div style={{ fontSize: 13, color: S.sub, marginBottom: 22 }}>Weka PIN yako ili kuendelea</div>
+        <input
+          type="password" inputMode="numeric" maxLength={8} value={pinAttempt}
+          onChange={e => { setPinAttempt(e.target.value); setPinError(""); }}
+          onKeyDown={e => { if (e.key === "Enter") unlockApp(pinAttempt); }}
+          placeholder="••••" autoFocus
+          style={{
+            width: 160, textAlign: "center", letterSpacing: 8, fontSize: 24,
+            padding: "12px 14px", borderRadius: 14, border: `1.5px solid ${S.border}`,
+            background: S.white, color: S.text, outline: "none", marginBottom: 12, fontFamily: "inherit"
+          }}
+        />
+        {pinError && <div style={{ color: S.red, fontSize: 12, marginBottom: 10 }}>{pinError}</div>}
+        <button onClick={() => unlockApp(pinAttempt)} style={{
+          background: S.green, color: "#fff", border: "none",
+          padding: "12px 30px", borderRadius: 22, fontSize: 14, fontWeight: 700, cursor: "pointer"
+        }}>Fungua</button>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       height: "100vh", display: "flex", flexDirection: "column",
-      background: S.bg, fontFamily: "Inter, Segoe UI, sans-serif",
+      background: S.bg, fontFamily: S.fontFamily, fontSize: S.baseFontSize,
       maxWidth: 480, margin: "0 auto", position: "relative",
       boxShadow: "0 0 40px rgba(0,0,0,0.12)", overflow: "hidden"
     }}>
@@ -1380,6 +2235,8 @@ function App() {
         onClose={() => setMenuOpen(false)}
         userName={user?.name}
         userEmail={user?.email}
+        onOpenSettings={() => setView("settings")}
+        onOpenAI={() => setView("ai")}
       />
 
       {toast && (
@@ -1463,8 +2320,8 @@ function App() {
                 </div>
               </div>
 
-              <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
-                {contacts.length === 0 ? (
+              <div style={{ flex: 1, minHeight: 0, overflowY: "auto", position: "relative" }}>
+                {visibleContacts.length === 0 ? (
                   <div style={{ padding: "60px 24px", textAlign: "center" }}>
                     <div style={{ fontSize: 52, marginBottom: 14 }}>📭</div>
                     <div style={{ fontSize: 16, fontWeight: 600, color: S.text, marginBottom: 8 }}>
@@ -1482,10 +2339,30 @@ function App() {
                     </button>
                   </div>
                 ) : (
-                  contacts.map(c => (
-                    <ContactRow key={c.id} contact={c} onClick={() => openThread(c)} />
+                  visibleContacts.map(c => (
+                    <ContactRow
+                      key={c.id}
+                      contact={c}
+                      isFavorite={settings.favoriteEmails.includes((c.email || "").toLowerCase())}
+                      onClick={() => openThread(c)}
+                      onLongAction={(contact) => toggleHideContact(contact)}
+                    />
                   ))
                 )}
+
+                {/* ── Kitufe cha kuelea cha VPN K AI - juu kushoto ya "Anza chat" ── */}
+                <button
+                  onClick={() => setView("ai")}
+                  title="VPN K AI"
+                  style={{
+                    position: "fixed", left: "max(16px, calc(50% - 232px))", bottom: 78,
+                    width: 52, height: 52, borderRadius: "50%",
+                    background: `linear-gradient(135deg, ${S.green}, ${S.greenDark})`,
+                    border: "none", color: "#fff", fontSize: 22,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    boxShadow: `0 6px 18px ${S.green}66`, cursor: "pointer", zIndex: 50
+                  }}
+                >🤖</button>
               </div>
 
               <div style={{
@@ -1494,7 +2371,7 @@ function App() {
                 display: "flex", justifyContent: "flex-end", gap: 10,
                 flexShrink: 0
               }}>
-                {contacts.length > 0 && (
+                {visibleContacts.length > 0 && (
                   <button onClick={() => loadThreads()} disabled={busy} style={{
                     background: "transparent", color: S.green,
                     border: `1.5px solid ${S.green}`,
@@ -1535,7 +2412,7 @@ function App() {
                 }} title="Reload">🔄</button>
               </div>
 
-              <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "10px 0", background: "#ECE5DD" }}>
+              <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "10px 0", background: S.chatBg }}>
                 {busy && activeChats.length === 0 ? (
                   <div style={{ textAlign: "center", padding: 40, color: S.sub }}>
                     <div style={{ fontSize: 28, marginBottom: 8 }}>⏳</div>Inapakia...
@@ -1547,33 +2424,56 @@ function App() {
                     <div style={{ fontSize: 12, marginTop: 4 }}>Tuma ujumbe wa kwanza</div>
                   </div>
                 ) : (
-                  activeChats.map(msg => <Bubble key={msg.id} msg={msg} />)
+                  activeChats.map(msg => <Bubble key={msg.id} msg={msg} ttsEnabled={settings.ttsEnabled} />)
                 )}
                 <div ref={endRef} />
               </div>
 
+              {settings.quickReplies && settings.quickReplies.length > 0 && (
+                <div style={{
+                  display: "flex", gap: 8, padding: "8px 12px 0",
+                  overflowX: "auto", flexShrink: 0, background: S.white
+                }}>
+                  {settings.quickReplies.map((qr, i) => (
+                    <button key={i} onClick={() => setInput(prev => prev ? prev + " " + qr : qr)}
+                      style={{
+                        flexShrink: 0, background: S.input, border: `1px solid ${S.border}`,
+                        color: S.text, borderRadius: 16, padding: "6px 13px",
+                        fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap"
+                      }}>{qr}</button>
+                  ))}
+                </div>
+              )}
+
               <div style={{
                 background: S.white, padding: "10px 12px",
-                display: "flex", alignItems: "flex-end", gap: 8,
+                display: "flex", flexDirection: "column", gap: 4,
                 borderTop: `1px solid ${S.border}`, flexShrink: 0
               }}>
-                <textarea value={input} onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
-                  placeholder={`Ujumbe kwa ${active.name}...`} rows={1}
-                  style={{
-                    flex: 1, background: S.input, border: "none",
-                    borderRadius: 20, padding: "10px 16px", fontSize: 16,
-                    color: S.text, resize: "none", outline: "none",
-                    fontFamily: "inherit", lineHeight: 1.5, maxHeight: 100, overflowY: "auto"
-                  }} />
-                <button onClick={sendReply} disabled={!input.trim() || busy} style={{
-                  background: input.trim() ? S.green : "#ccc", border: "none",
-                  color: "#fff", width: 42, height: 42, borderRadius: "50%",
-                  cursor: input.trim() ? "pointer" : "default", fontSize: 18,
-                  flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: input.trim() ? "0 2px 8px rgba(38,166,154,0.4)" : "none",
-                  transition: "all 0.2s"
-                }}>{busy ? "⏳" : "➤"}</button>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 8 }}>
+                  <textarea value={input} onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendReply(); } }}
+                    placeholder={`Ujumbe kwa ${active.name}...`} rows={1}
+                    style={{
+                      flex: 1, background: S.input, border: "none",
+                      borderRadius: 20, padding: "10px 16px", fontSize: S.baseFontSize + 1,
+                      color: S.text, resize: "none", outline: "none",
+                      fontFamily: "inherit", lineHeight: 1.5, maxHeight: 100, overflowY: "auto"
+                    }} />
+                  <button onClick={sendReply} disabled={!input.trim() || busy} style={{
+                    background: input.trim() ? S.green : "#ccc", border: "none",
+                    color: "#fff", width: 42, height: 42, borderRadius: "50%",
+                    cursor: input.trim() ? "pointer" : "default", fontSize: 18,
+                    flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                    boxShadow: input.trim() ? `0 2px 8px ${S.green}66` : "none",
+                    transition: "all 0.2s"
+                  }}>{busy ? "⏳" : "➤"}</button>
+                </div>
+                {settings.showCharCounter && (
+                  <div style={{ textAlign: "right", fontSize: 10.5, color: S.sub, paddingRight: 4 }}>
+                    {input.length} herufi
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -1622,6 +2522,11 @@ function App() {
                     onFocus={e => e.target.style.borderColor = S.green}
                     onBlur={e => e.target.style.borderColor = S.border}
                   />
+                  {settings.showCharCounter && (
+                    <div style={{ textAlign: "right", fontSize: 11, color: S.sub, marginTop: 4 }}>
+                      {ncMsg.length} herufi
+                    </div>
+                  )}
                 </div>
                 <button onClick={sendNew} disabled={busy || !ncEmail.trim() || !ncMsg.trim()} style={{
                   width: "100%",
@@ -1636,6 +2541,22 @@ function App() {
                 </button>
               </div>
             </>
+          )}
+
+          {/* ══════════════════════ MIPANGILIO (SETTINGS) ══════════════════════ */}
+          {view === "settings" && (
+            <SettingsScreen
+              settings={settings}
+              updateSettings={updateSettings}
+              onBack={() => setView("inbox")}
+              showToast={showToast}
+              user={user}
+            />
+          )}
+
+          {/* ══════════════════════ VPN K AI ══════════════════════ */}
+          {view === "ai" && (
+            <VpnkAIScreen onBack={() => setView("inbox")} settings={settings} />
           )}
         </>
       )}
